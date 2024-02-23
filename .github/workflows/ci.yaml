@@ -1,0 +1,35 @@
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+name: CI
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ hashFiles('requirements.txt', 'requirements-test.txt') }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install -r requirements-test.txt
+        pip install -e .
+    - name: Run flake8
+      run: |
+        flake8 variational
+    - name: Run tests
+      run: pytest tests

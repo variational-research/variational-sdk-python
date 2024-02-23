@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "variational"
+version = "0.0.0"
+authors = [
+  { name="Variational Research", email="hello@variational.io" },
+]
+dependencies = [
+    "requests >= 2.12",
+    "Brotli >= 1.0",
+]
+description = "Variational Reference SDK"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Intended Audience :: Developers",
+]
+
+[project.urls]
+Homepage = "https://variational.io"
+Documentation = "https://docs.variational.io/for-developers/api"
+Repository = "https://github.com/variational-research/variational-sdk-python/"
+Issues = "https://github.com/variational-research/variational-sdk-python/issues"
+
+[tool.hatch.build]
+exclude = [
+  "/.*"
+]

@@ -1,0 +1,7 @@
+*.pyc
+__pycache__/
+dist/
+.python-version
+.DS_Store
+.idea
+
