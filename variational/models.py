@@ -395,6 +395,27 @@ class RFQ(TypedDict):
     asks: List[QuoteWithMarginRequirements]
 
 
+class FundingRateParams(TypedDict):
+    normal_threshold: StrDecimal
+    high_threshold: StrDecimal
+    extreme_threshold: StrDecimal
+    normal_slope: StrDecimal
+    high_slope: StrDecimal
+    extreme_slope: StrDecimal
+    min_imbalance_dollars: StrDecimal
+
+
+class SupportedAssetDetails(TypedDict):
+    asset: AssetToken
+    asset_name: str
+    is_dex: bool
+    address: Optional[H160]
+    verified: Optional[bool]
+    precision: int
+    last_updated_at: DateTimeRFC3339
+    variational_funding_rate_params: FundingRateParams
+
+
 class ApiRole(Enum):
     READER = "reader"
     WRITER = "writer"

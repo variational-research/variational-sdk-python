@@ -1,6 +1,6 @@
 import time
 import random
-from typing import Optional, Dict, Mapping
+from typing import Optional, Dict, Mapping, List
 from urllib.parse import urlencode
 
 import requests
@@ -8,7 +8,8 @@ import logging
 
 from .auth import sign_prepared_request
 from .models import (Address, Company, SettlementPool, Asset, Position, AggregatedPosition,
-                     Trade, Transfer, PortfolioSummary, Quote, Status, AuthContext, RFQ)
+                     Trade, Transfer, PortfolioSummary, Quote, Status, AuthContext, RFQ, AssetToken,
+                     SupportedAssetDetails)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
 RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-reset-ms"
@@ -111,6 +112,13 @@ class Client(object):
         if id:
             filter['id'] = id
         return ApiPage.from_response(self.__get_resources("/rfqs/sent", filter, page))
+
+    def get_supported_assets(self, verified: Optional[bool] = False,
+                             page: Optional[Dict] = None) -> ApiSingle[Dict[AssetToken, List[SupportedAssetDetails]]]:
+        filter = {}
+        if verified:
+            filter['verified'] = 'true'
+        return ApiSingle.from_response(self.__get_resources("/metadata/supported_assets", filter, page))
 
     def get_status(self) -> ApiSingle[Status]:
         return ApiSingle.from_response(self.__get_resources("/status"))
