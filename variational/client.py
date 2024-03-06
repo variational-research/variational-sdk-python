@@ -113,12 +113,13 @@ class Client(object):
             filter['id'] = id
         return ApiPage.from_response(self.__get_resources("/rfqs/sent", filter, page))
 
-    def get_supported_assets(self, verified: Optional[bool] = False,
-                             page: Optional[Dict] = None) -> ApiSingle[Dict[AssetToken, List[SupportedAssetDetails]]]:
+    def get_supported_assets(self, verified: Optional[bool] = False, page: Optional[Dict] = None) \
+            -> ApiSingle[Dict[AssetToken, List[SupportedAssetDetails]]]:
         filter = {}
         if verified:
             filter['verified'] = 'true'
-        return ApiSingle.from_response(self.__get_resources("/metadata/supported_assets", filter, page))
+        return ApiSingle.from_response(self.__get_resources(
+            "/metadata/supported_assets", filter, page))
 
     def get_status(self) -> ApiSingle[Status]:
         return ApiSingle.from_response(self.__get_resources("/status"))
