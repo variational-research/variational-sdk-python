@@ -29,7 +29,7 @@ client = Client(API_KEY, API_SECRET, base_url=TESTNET)
 trades = list(paginate(client.get_portfolio_trades))
 ```
 
-Note: if you have a lot of trades in the account, it might make multiple requests and significant amount of time
+Note: if you have a lot of trades in the account, it might make multiple requests and take a significant amount of time
 to fetch all of them.  
 See [Pagination](https://docs.variational.io/for-developers/api/pagination) for potential debugging steps.
 
