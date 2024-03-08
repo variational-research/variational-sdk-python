@@ -24,9 +24,11 @@ pip install variational
 
 ```python
 from variational import Client, TESTNET
+from pprint import pprint
 
 client = Client(API_KEY, API_SECRET, base_url=TESTNET)
 summary = client.get_portfolio_summary().result
+pprint(summary)
 ```
 
 **Client parameters:**
