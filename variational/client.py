@@ -18,8 +18,8 @@ TESTNET = "https://api.testnet.variational.io/v1"
 
 
 class Client(object):
-    def __init__(self, key: str, secret: str, base_url: str = MAINNET, request_timeout: Optional[float] = None,
-                 retry_rate_limits=True):
+    def __init__(self, key: str, secret: str, base_url: str = MAINNET,
+                 request_timeout: Optional[float] = None, retry_rate_limits=True):
         self.sesh = requests.session()
         self.key = key
         self.secret = secret
@@ -143,7 +143,8 @@ class Client(object):
 
         while True:
             req = requests.Request(method="GET", url=self.base_url + endpoint + qs).prepare()
-            resp = self.sesh.send(sign_prepared_request(req, self.key, self.secret), timeout=self.request_timeout)
+            resp = self.sesh.send(sign_prepared_request(req, self.key, self.secret),
+                                  timeout=self.request_timeout)
 
             if resp.status_code == 200:
                 return resp
