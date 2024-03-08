@@ -18,11 +18,14 @@ TESTNET = "https://api.testnet.variational.io/v1"
 
 
 class Client(object):
-    def __init__(self, key: str, secret: str, base_url: str = MAINNET, retry_rate_limits=True):
+    def __init__(self, key: str, secret: str, base_url: str = MAINNET,
+                 request_timeout: Optional[float] = None, retry_rate_limits=True):
         self.sesh = requests.session()
         self.key = key
         self.secret = secret
         self.base_url = base_url
+        self.logger = logging.getLogger(__name__)
+        self.request_timeout = request_timeout
         self.retry_rate_limits = retry_rate_limits
 
     def get_addresses(self, company: Optional[str] = None) -> ApiList[Address]:
@@ -140,7 +143,8 @@ class Client(object):
 
         while True:
             req = requests.Request(method="GET", url=self.base_url + endpoint + qs).prepare()
-            resp = self.sesh.send(sign_prepared_request(req, self.key, self.secret))
+            resp = self.sesh.send(sign_prepared_request(req, self.key, self.secret),
+                                  timeout=self.request_timeout)
 
             if resp.status_code == 200:
                 return resp
@@ -160,8 +164,8 @@ class Client(object):
                     # an extra delay that's slowly increasing with each attempt
                     delay = hard_delay + backoff.next_delay()
 
-                    logging.debug("HTTP 429 Too Many Requests was returned from the API, "
-                                  "will retry after delay: %.3fs", delay)
+                    self.logger.warning("HTTP 429 Too Many Requests was returned from the API, "
+                                        "will retry after delay: %.3fs", delay)
                     time.sleep(delay)
                     continue
 
