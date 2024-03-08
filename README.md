@@ -26,6 +26,10 @@ pip install variational
 from variational import Client, TESTNET
 from pprint import pprint
 
+# FIXME: load from environment variables
+API_KEY = "your-api-key"
+API_SECRET = "your-api-secret"
+
 client = Client(API_KEY, API_SECRET, base_url=TESTNET)
 summary = client.get_portfolio_summary().result
 pprint(summary)
