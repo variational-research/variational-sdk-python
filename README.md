@@ -23,15 +23,11 @@ pip install variational
 ### 3. Make some requests!
 
 ```python
-from variational import Client, TESTNET, paginate
+from variational import Client, TESTNET
 
 client = Client(API_KEY, API_SECRET, base_url=TESTNET)
-trades = list(paginate(client.get_portfolio_trades))
+summary = client.get_portfolio_summary().result
 ```
-
-Note: if you have a lot of trades in the account, it might make multiple requests and take a significant amount of time
-to fetch all of them.  
-See [Pagination](https://docs.variational.io/for-developers/api/pagination) for potential debugging steps.
 
 **Client parameters:**
  - `key`: str (required) — your API key
