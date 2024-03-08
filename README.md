@@ -8,11 +8,11 @@ https://docs.variational.io/for-developers/api
 
 ### 1. Create API credentials
 
-Navigate to the API section at https://testnet.variational.io/app/settings
+Navigate to the API settings page at https://testnet.variational.io/app/settings
 
 <img width="1033" alt="Variational / Settings / API" src="https://github.com/variational-research/variational-sdk-python/assets/155017661/b2cb472b-7742-4c74-9836-12dee28dcfb8">
 
-Create your key and make sure to save the secret part as it's only displayed once.
+Add a descriptive label, create your key, and make sure to save the secret as it's only displayed once.
 
 ### 2. Install Python SDK
 
@@ -20,7 +20,7 @@ Create your key and make sure to save the secret part as it's only displayed onc
 pip install variational
 ```
 
-### 3. Make some calls!
+### 3. Make some requests!
 
 ```python
 from variational import Client, TESTNET, paginate
@@ -33,7 +33,7 @@ Note: if you have a lot of trades in the account, it might make multiple request
 to fetch all of them.  
 See [Pagination](https://docs.variational.io/for-developers/api/pagination) for potential debugging steps.
 
-*Client parameters:*
+**Client parameters:**
  - `key`: str (required) — your API key
  - `secret`: str (required) — your API secret
  - `base_url`: str (optional) — prefix of Variational API endpoints
