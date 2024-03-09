@@ -12,7 +12,7 @@ from .models import (Address, Company, SettlementPool, Asset, Position, Aggregat
                      SupportedAssetDetails)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
-RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-reset-ms"
+RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-resets-in-ms"
 MAINNET = "https://api.variational.io/v1"
 TESTNET = "https://api.testnet.variational.io/v1"
 
@@ -150,19 +150,10 @@ class Client(object):
                 return resp
 
             if self.retry_rate_limits and resp.status_code == 429:
-                resets_at_timestamp = _get_rate_limit_reset_timestamp(
-                    resp.headers)
-                if resets_at_timestamp:
-                    timestamp_now = time.time()
-
-                    # delay until at least the timestamp specified in the header
-                    if timestamp_now < resets_at_timestamp:
-                        hard_delay = resets_at_timestamp - timestamp_now
-                    else:
-                        hard_delay = 0
-
-                    # an extra delay that's slowly increasing with each attempt
-                    delay = hard_delay + backoff.next_delay()
+                if resets_in := _get_rate_limit_reset_timestamp(resp.headers):
+                    # delay for at least the amount specified in the header
+                    # add an extra delay that's slowly increasing with each attempt
+                    delay = resets_in + backoff.next_delay()
 
                     self.logger.warning("HTTP 429 Too Many Requests was returned from the API, "
                                         "will retry after delay: %.3fs", delay)

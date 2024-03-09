@@ -20,6 +20,9 @@ class ApiError(Exception):
     api_code: int
     message: str
 
+    def __str__(self):
+        return repr(self)
+
 
 @dataclass
 class ApiSingle(Generic[T]):
