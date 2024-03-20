@@ -403,6 +403,7 @@ class FundingRateParams(TypedDict):
     high_slope: StrDecimal
     extreme_slope: StrDecimal
     min_imbalance_dollars: StrDecimal
+    funding_exponent_factor: StrDecimal
 
 
 class SupportedAssetDetails(TypedDict):
