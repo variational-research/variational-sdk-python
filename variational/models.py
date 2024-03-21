@@ -1,5 +1,5 @@
 import sys
-from enum import Enum
+from enum import StrEnum
 from typing import TypedDict, Optional, List, Dict, Union
 
 if sys.version_info[0:2] >= (3, 10):
@@ -40,7 +40,7 @@ class Asset(TypedDict):
     qty: StrDecimal
 
 
-class InstrumentType(Enum):
+class InstrumentType(StrEnum):
     SPOT = "spot"
     DATED_FUTURE = "dated_future"
     PERPETUAL_FUTURE = "perpetual_future"
@@ -67,12 +67,12 @@ class PerpetualFuture(TypedDict):
     funding_interval_s: int
 
 
-class PayoffType(Enum):
+class PayoffType(StrEnum):
     PUT = "put"
     CALL = "call"
 
 
-class ExerciseType(Enum):
+class ExerciseType(StrEnum):
     EUROPEAN = "european"
     AMERICAN = "american"
 
@@ -113,17 +113,17 @@ class AggregatedPosition(TypedDict):
     position_info: Position
 
 
-class TradeSide(Enum):
+class TradeSide(StrEnum):
     BUY = "buy"
     SELL = "sell"
 
 
-class TradeRole(Enum):
+class TradeRole(StrEnum):
     MAKER = "maker"
     TAKER = "taker"
 
 
-class TradeType(Enum):
+class TradeType(StrEnum):
     TRADE = "trade"
     SETTLEMENT = "settlement"
     LIQUIDATION = "liquidation"
@@ -154,7 +154,7 @@ class SimpleMarginAssetParam(TypedDict):
     option_maintenance_margin: StrDecimal
 
 
-class MarginMode(Enum):
+class MarginMode(StrEnum):
     SIMPLE = "simple"
     PORTFOLIO = "portfolio"
 
@@ -202,7 +202,7 @@ class PoolMarginUsageStats(TypedDict):
     margin_usage: MarginUsage
 
 
-class SettlementPoolStatus(Enum):
+class SettlementPoolStatus(StrEnum):
     OPEN = "open"
     PENDING = "pending"
     CANCELED = "canceled"
@@ -226,13 +226,13 @@ class SettlementPool(TypedDict):
     error: Optional[str]
 
 
-class TransferStatus(Enum):
+class TransferStatus(StrEnum):
     PENDING = "pending"
     FAILED = "failed"
     CONFIRMED = "confirmed"
 
 
-class TransferType(Enum):
+class TransferType(StrEnum):
     PREMIUM = "premium"
     DEPOSIT = "deposit"
     WITHDRAWAL = "withdrawal"
@@ -269,7 +269,7 @@ class PortfolioSummary(TypedDict):
     sum_dollar_gamma: StrDecimal
 
 
-class ClearingStatus(Enum):
+class ClearingStatus(StrEnum):
     PENDING_TAKER_DEPOSIT_APPROVAL = "pending_taker_deposit_approval"
     PENDING_MAKER_DEPOSIT_APPROVAL = "pending_maker_deposit_approval"
     PENDING_MAKER_LAST_LOOK = "pending_maker_last_look"
@@ -373,7 +373,7 @@ class QuoteWithMarginRequirements(TypedDict):
     existing_margin_requirements_request_id: UUIDv4
 
 
-class RFQStatus(Enum):
+class RFQStatus(StrEnum):
     OPEN = "open"
     EXPIRED = "expired"
     CANCELED = "canceled"
@@ -416,7 +416,7 @@ class SupportedAssetDetails(TypedDict):
     variational_funding_rate_params: FundingRateParams
 
 
-class ApiRole(Enum):
+class ApiRole(StrEnum):
     READER = "reader"
     WRITER = "writer"
 

@@ -9,7 +9,7 @@ import logging
 from .auth import sign_prepared_request
 from .models import (Address, Company, SettlementPool, Asset, Position, AggregatedPosition,
                      Trade, Transfer, PortfolioSummary, Quote, Status, AuthContext, RFQ, AssetToken,
-                     SupportedAssetDetails)
+                     SupportedAssetDetails, Structure, StrDecimal, DateTimeRFC3339, UUIDv4)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
 RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-resets-in-ms"
@@ -32,41 +32,45 @@ class Client(object):
         f = {}
         if company:
             f['company'] = company
-        return ApiList.from_response(self.__get_resources("/addresses", filter=f))
+        return ApiList.from_response(self.__send_request(endpoint="/addresses", filter=f))
 
     def get_companies(self, id: Optional[str] = None,
                       page: Optional[Dict] = None) -> ApiPage[Company]:
         filter = {}
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/companies", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/companies",
+                                                         filter=filter, page=page))
 
     def get_settlement_pools(self, id: Optional[str] = None,
                              page: Optional[Dict] = None) -> ApiPage[SettlementPool]:
         filter = {}
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/settlement_pools", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/settlement_pools",
+                                                         filter=filter, page=page))
 
     def get_portfolio_assets(self, pool: Optional[str] = None,
                              page: Optional[Dict] = None) -> ApiPage[Asset]:
         filter = {}
         if pool:
             filter['pool'] = pool
-        return ApiPage.from_response(self.__get_resources("/portfolio/assets", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/portfolio/assets",
+                                                         filter=filter, page=page))
 
     def get_portfolio_positions(self, pool: Optional[str] = None,
                                 page: Optional[Dict] = None) -> ApiPage[Position]:
         filter = {}
         if pool:
             filter['pool'] = pool
-        return ApiPage.from_response(self.__get_resources("/portfolio/positions", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/portfolio/positions",
+                                                         filter=filter, page=page))
 
     def get_portfolio_aggregated_positions(self,
                                            page: Optional[Dict] = None
                                            ) -> ApiPage[AggregatedPosition]:
-        return ApiPage.from_response(self.__get_resources(
-            "/portfolio/positions/aggregated", page=page))
+        return ApiPage.from_response(self.__send_request(
+            endpoint="/portfolio/positions/aggregated", page=page))
 
     def get_portfolio_trades(self, pool: Optional[str] = None, id: Optional[str] = None,
                              page: Optional[Dict] = None) -> ApiPage[Trade]:
@@ -75,7 +79,8 @@ class Client(object):
             filter['pool'] = pool
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/portfolio/trades", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/portfolio/trades",
+                                                         filter=filter, page=page))
 
     def get_portfolio_transfers(self, pool: Optional[str] = None, id: Optional[str] = None,
                                 page: Optional[Dict] = None) -> ApiPage[Transfer]:
@@ -84,54 +89,73 @@ class Client(object):
             filter['pool'] = pool
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/portfolio/transfers", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/portfolio/transfers",
+                                                         filter=filter, page=page))
 
     def get_portfolio_summary(self) -> ApiSingle[PortfolioSummary]:
-        return ApiSingle.from_response(self.__get_resources("/portfolio/summary"))
+        return ApiSingle.from_response(self.__send_request(endpoint="/portfolio/summary"))
 
     def get_quotes_received(self, id: Optional[str] = None,
                             page: Optional[Dict] = None) -> ApiPage[Quote]:
         filter = {}
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/quotes/received", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/quotes/received",
+                                                         filter=filter, page=page))
 
     def get_quotes_sent(self, id: Optional[str] = None,
                         page: Optional[Dict] = None) -> ApiPage[Quote]:
         filter = {}
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/quotes/sent", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/quotes/sent",
+                                                         filter=filter, page=page))
 
     def get_rfqs_received(self, id: Optional[str] = None,
                           page: Optional[Dict] = None) -> ApiPage[RFQ]:
         filter = {}
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/rfqs/received", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/rfqs/received",
+                                                         filter=filter, page=page))
 
     def get_rfqs_sent(self, id: Optional[str] = None, page: Optional[Dict] = None) -> ApiPage[RFQ]:
         filter = {}
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__get_resources("/rfqs/sent", filter, page))
+        return ApiPage.from_response(self.__send_request(endpoint="/rfqs/sent",
+                                                         filter=filter, page=page))
 
     def get_supported_assets(self, verified: Optional[bool] = False, page: Optional[Dict] = None) \
             -> ApiSingle[Dict[AssetToken, List[SupportedAssetDetails]]]:
         filter = {}
         if verified:
             filter['verified'] = 'true'
-        return ApiSingle.from_response(self.__get_resources(
-            "/metadata/supported_assets", filter, page))
+        return ApiSingle.from_response(self.__send_request(
+            endpoint="/metadata/supported_assets", filter=filter, page=page))
 
     def get_status(self) -> ApiSingle[Status]:
-        return ApiSingle.from_response(self.__get_resources("/status"))
+        return ApiSingle.from_response(self.__send_request(endpoint="/status"))
 
     def get_me(self) -> ApiSingle[AuthContext]:
-        return ApiSingle.from_response(self.__get_resources("/me"))
+        return ApiSingle.from_response(self.__send_request(endpoint="/me"))
 
-    def __get_resources(self, endpoint: str, filter: Optional[Dict] = None,
-                        page: Optional[Dict] = None) -> requests.Response:
+    def create_rfq(self, structure: Structure, qty: StrDecimal, expires_at: DateTimeRFC3339,
+                   target_companies: List[UUIDv4]) -> ApiSingle[RFQ]:
+
+        payload = {
+            "structure": structure,
+            "qty": qty,
+            "expires_at": expires_at,
+            "target_companies": target_companies,
+        }
+
+        return ApiSingle.from_response(self.__send_request(endpoint="/rfqs/new",
+                                                           method="POST", payload=payload))
+
+    def __send_request(self, endpoint: str, method: str = "GET", payload: Optional[Dict] = None,
+                       filter: Optional[Dict] = None,
+                       page: Optional[Dict] = None) -> requests.Response:
         params = {}
         if filter:
             params.update(filter)
@@ -142,7 +166,8 @@ class Client(object):
         backoff = ExpBackoff()
 
         while True:
-            req = requests.Request(method="GET", url=self.base_url + endpoint + qs).prepare()
+            req = requests.Request(method=method, url=self.base_url + endpoint + qs,
+                                   json=payload).prepare()
             resp = self.sesh.send(sign_prepared_request(req, self.key, self.secret),
                                   timeout=self.request_timeout)
 
