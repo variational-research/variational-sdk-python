@@ -160,10 +160,14 @@ class MarginMode(StrEnum):
 
 
 class SimpleMarginParams(TypedDict):
-    margin_mode: MarginMode  # == SIMPLE
     asset_params: Dict[AssetToken, SimpleMarginAssetParam]
     liquidation_penalty: StrDecimal
     auto_liquidation: bool
+
+
+class SimpleMarginParamsTag(TypedDict):
+    margin_mode: MarginMode  # == SIMPLE
+    params: SimpleMarginParams
 
 
 class PortfolioMarginAssetParam(TypedDict):
@@ -179,7 +183,6 @@ class PortfolioMarginAssetParam(TypedDict):
 
 
 class PortfolioMarginParams(TypedDict):
-    margin_mode: MarginMode  # == PORTFOLIO
     asset_params: Dict[AssetToken, PortfolioMarginAssetParam]
     decorrelation_risk: StrDecimal
     initial_margin_factor: StrDecimal
@@ -187,7 +190,32 @@ class PortfolioMarginParams(TypedDict):
     auto_liquidation: bool
 
 
-MarginParams = Union[SimpleMarginParams, PortfolioMarginParams]
+class PortfolioMarginParamsTag(TypedDict):
+    margin_mode: MarginMode  # == PORTFOLIO
+    params: PortfolioMarginParams
+
+
+MarginParams = Union[SimpleMarginParamsTag, PortfolioMarginParamsTag]
+
+
+class PoolStrategyType(StrEnum):
+    USE_EXISTING = "use_existing"
+    CREATE_NEW = "create_new"
+
+
+class UseExistingPool(TypedDict):
+    strategy: PoolStrategyType  # == USE_EXISTING
+    pool_id: UUIDv4
+
+
+class CreateNewPool(TypedDict):
+    strategy: PoolStrategyType  # == CREATE_NEW
+    name: str
+    creator_params: MarginParams
+    other_params: MarginParams
+
+
+PoolStrategy = Union[UseExistingPool, CreateNewPool]
 
 
 class MarginUsage(TypedDict):
@@ -295,8 +323,6 @@ class ClearingEvent(TypedDict):
 
 
 class LegQuote(TypedDict):
-    parent_quote_id: UUIDv4
-    quote_id: UUIDv4
     target_rfq_leg_id: UUIDv4
     ask: Optional[StrDecimal]
     bid: Optional[StrDecimal]
