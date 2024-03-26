@@ -1,16 +1,17 @@
-import time
+import logging
 import random
+import time
 from typing import Optional, Dict, Mapping, List
 from urllib.parse import urlencode
 
 import requests
-import logging
 
 from .auth import sign_prepared_request
-from .models import (Address, Company, SettlementPool, Asset, Position, AggregatedPosition,
-                     Trade, Transfer, PortfolioSummary, Quote, Status, AuthContext, RFQ, AssetToken,
-                     SupportedAssetDetails, Structure, StrDecimal, DateTimeRFC3339, UUIDv4, LegQuote,
-                     PoolStrategy)
+from .models import (StrDecimal, DateTimeRFC3339, AssetToken, UUIDv4, Company, Address,
+                     SettlementPool, Asset, Position, AggregatedPosition, Trade, Transfer,
+                     PortfolioSummary, Quote, RFQ, SupportedAssetDetails, AuthContext, Status,
+                     Structure, PoolStrategy, LegQuote, QuoteAcceptResponse, MakerLastLookResponse,
+                     MarginParams, TradeSide, TransferType, RequestAction)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
 RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-resets-in-ms"
@@ -120,7 +121,8 @@ class Client(object):
         return ApiPage.from_response(self.__send_request(endpoint="/rfqs/received",
                                                          filter=filter, page=page))
 
-    def get_rfqs_sent(self, id: Optional[UUIDv4] = None, page: Optional[Dict] = None) -> ApiPage[RFQ]:
+    def get_rfqs_sent(self, id: Optional[UUIDv4] = None,
+                      page: Optional[Dict] = None) -> ApiPage[RFQ]:
         filter = {}
         if id:
             filter['id'] = id
@@ -166,6 +168,83 @@ class Client(object):
         }
 
         return ApiSingle.from_response(self.__send_request(endpoint="/quotes/new",
+                                                           method="POST", payload=payload))
+
+    def replace_quote(self, parent_quote_id: UUIDv4, rfq_id: UUIDv4, expires_at: DateTimeRFC3339,
+                      leg_quotes: List[LegQuote],
+                      pool_strategy: PoolStrategy,
+                      client_quote_id: Optional[str] = None) -> ApiSingle[Quote]:
+        payload = {
+            "parent_quote_id": parent_quote_id,
+            "rfq_id": rfq_id,
+            "expires_at": expires_at,
+            "leg_quotes": leg_quotes,
+            "pool_strategy": pool_strategy,
+            "client_quote_id": client_quote_id,
+        }
+
+        return ApiSingle.from_response(self.__send_request(endpoint="/quotes/replace",
+                                                           method="POST", payload=payload))
+
+    def accept_quote(self, rfq_id: UUIDv4,
+                     parent_quote_id: UUIDv4,
+                     side: TradeSide) -> ApiSingle[QuoteAcceptResponse]:
+        payload = {
+            "parent_quote_id": parent_quote_id,
+            "rfq_id": rfq_id,
+            "side": side,
+        }
+
+        return ApiSingle.from_response(self.__send_request(endpoint="/quotes/accept",
+                                                           method="POST", payload=payload))
+
+    def maker_last_look(self, rfq_id: UUIDv4,
+                        parent_quote_id: UUIDv4,
+                        action: RequestAction) -> ApiSingle[MakerLastLookResponse]:
+        payload = {
+            "parent_quote_id": parent_quote_id,
+            "rfq_id": rfq_id,
+            "action": action,
+        }
+        return ApiSingle.from_response(self.__send_request(endpoint="/quotes/maker_last_look",
+                                                           method="POST", payload=payload))
+
+    def cancel_rfq(self, id: UUIDv4) -> ApiSingle[bool]:
+        payload = {'id': id}
+        return ApiSingle.from_response(self.__send_request(endpoint="/rfqs/cancel",
+                                                           method="POST", payload=payload))
+
+    def cancel_quote(self, id: UUIDv4) -> ApiSingle[bool]:
+        payload = {'id': id}
+        return ApiSingle.from_response(self.__send_request(endpoint="/quotes/cancel",
+                                                           method="POST", payload=payload))
+
+    def cancel_all_quotes(self) -> ApiSingle[bool]:
+        return ApiSingle.from_response(self.__send_request(endpoint="/quotes/cancel_all",
+                                                           method="POST"))
+
+    def create_settlement_pool(self, pool_name: str, company_other: UUIDv4,
+                               creator_params: MarginParams,
+                               other_params: MarginParams) -> ApiSingle[SettlementPool]:
+        payload = {
+            "pool_name": pool_name,
+            "company_other": company_other,
+            "creator_params": creator_params,
+            "other_params": other_params,
+        }
+        return ApiSingle.from_response(self.__send_request(endpoint="/settlement_pools/new",
+                                                           method="POST", payload=payload))
+
+    def create_transfer(self, asset: AssetToken, qty: StrDecimal,
+                        target_pool_location: UUIDv4,
+                        transfer_type: TransferType) -> ApiSingle[Transfer]:
+        payload = {
+            'asset': asset,
+            'qty': qty,
+            'target_pool_location': target_pool_location,
+            'transfer_type': transfer_type,
+        }
+        return ApiSingle.from_response(self.__send_request(endpoint="/transfers/new",
                                                            method="POST", payload=payload))
 
     def __send_request(self, endpoint: str, method: str = "GET", payload: Optional[Dict] = None,
