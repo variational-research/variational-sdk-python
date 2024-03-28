@@ -162,6 +162,7 @@ class MarginMode(Enum):
 class SimpleMarginParams(TypedDict):
     margin_mode: MarginMode  # == SIMPLE
     asset_params: Dict[AssetToken, SimpleMarginAssetParam]
+    default_asset_param: SimpleMarginAssetParam
     liquidation_penalty: StrDecimal
     auto_liquidation: bool
 
@@ -181,6 +182,7 @@ class PortfolioMarginAssetParam(TypedDict):
 class PortfolioMarginParams(TypedDict):
     margin_mode: MarginMode  # == PORTFOLIO
     asset_params: Dict[AssetToken, PortfolioMarginAssetParam]
+    default_asset_param: PortfolioMarginAssetParam
     decorrelation_risk: StrDecimal
     initial_margin_factor: StrDecimal
     liquidation_penalty: StrDecimal
