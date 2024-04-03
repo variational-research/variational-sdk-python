@@ -31,8 +31,7 @@ class Client(object):
         self.request_timeout = request_timeout
         self.retry_rate_limits = retry_rate_limits
 
-    def accept_quote(self, rfq_id: UUIDv4,
-                     parent_quote_id: UUIDv4,
+    def accept_quote(self, rfq_id: UUIDv4, parent_quote_id: UUIDv4,
                      side: TradeSide) -> ApiSingle[QuoteAcceptResponse]:
         payload = {
             "parent_quote_id": parent_quote_id,

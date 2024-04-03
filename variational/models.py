@@ -32,6 +32,12 @@ class ClearingStatus(StrEnum):
     SUCCESS_TRADES_BOOKED_INTO_POOL = "success_trades_booked_into_pool"
 
 
+class DexNetworkID(StrEnum):
+    ETH = "eth"
+    BSC = "bsc"
+    SOLANA = "solana"
+
+
 class ExerciseType(StrEnum):
     EUROPEAN = "european"
     AMERICAN = "american"
@@ -130,17 +136,22 @@ class ClearingEvent(TypedDict):
 
 
 class CreateNewPool(TypedDict):
-    strategy: PoolStrategyType  # == CREATE_NEW
+    strategy: PoolStrategyType  # = CREATE_NEW
     name: str
     creator_params: 'MarginParams'
     other_params: 'MarginParams'
 
 
 class DatedFuture(TypedDict):
-    instrument_type: InstrumentType  # == DATED_FUTURE
-    underlying: str
-    settlement_asset: str
-    expiry: DateTimeRFC3339
+    instrument_type: InstrumentType  # = DATED_FUTURE
+    underlying: str  # ∈ {'BTC', 'ETH'}
+    settlement_asset: str  # = 'USDC'
+    expiry: DateTimeRFC3339  # date in the future or datetime at 08:00:00Z
+
+
+class DexTokenDetails(TypedDict):
+    network: DexNetworkID
+    underlying_address: H160
 
 
 class FundingRateParams(TypedDict):
@@ -156,7 +167,7 @@ class FundingRateParams(TypedDict):
 
 class Leg(TypedDict):
     side: TradeSide
-    ratio: int
+    ratio: int  # ≥ 1
     instrument: 'Instrument'
 
 
@@ -166,10 +177,11 @@ class MarginUsage(TypedDict):
 
 
 class PerpetualFuture(TypedDict):
-    instrument_type: InstrumentType  # == PERPETUAL_FUTURE
+    instrument_type: InstrumentType  # = PERPETUAL_FUTURE
     underlying: str
-    settlement_asset: str
-    funding_interval_s: int
+    settlement_asset: str  # = 'USDC'
+    funding_interval_s: int  # = 3600
+    dex_token_details: Optional[DexTokenDetails]  # required if underlying is a DEX token
 
 
 class PoolMarginUsageStats(TypedDict):
@@ -180,28 +192,28 @@ class PoolMarginUsageStats(TypedDict):
 
 
 class PortfolioMarginAssetParam(TypedDict):
-    vol_range_up: StrDecimal
-    vol_range_down: StrDecimal
-    short_vega_power: StrDecimal
-    long_vega_power: StrDecimal
-    price_range: StrDecimal
-    opt_sum_contingency: StrDecimal
-    opt_contingency: StrDecimal
-    futures_contingency: StrDecimal
-    atm_range: StrDecimal
+    vol_range_up: StrDecimal  # ∈ [0, 1]
+    vol_range_down: StrDecimal  # ∈ [0, 1]
+    short_vega_power: StrDecimal  # ∈ [0, 1]
+    long_vega_power: StrDecimal  # ∈ [0, 1]
+    price_range: StrDecimal  # ∈ [0, 1]
+    opt_sum_contingency: StrDecimal  # ∈ [0, 1]
+    opt_contingency: StrDecimal  # ∈ [0, 1]
+    futures_contingency: StrDecimal  # ∈ [0, 1]
+    atm_range: StrDecimal  # ∈ [0, 1]
 
 
 class PortfolioMarginParams(TypedDict):
     asset_params: Dict[AssetToken, PortfolioMarginAssetParam]
     default_asset_param: PortfolioMarginAssetParam
-    decorrelation_risk: StrDecimal
-    initial_margin_factor: StrDecimal
-    liquidation_penalty: StrDecimal
+    decorrelation_risk: StrDecimal  # ∈ [0, 1]
+    initial_margin_factor: StrDecimal  # > 1
+    liquidation_penalty: StrDecimal  # ∈ [0, 1]
     auto_liquidation: bool
 
 
 class PortfolioMarginParamsTag(TypedDict):
-    margin_mode: MarginMode  # == PORTFOLIO
+    margin_mode: MarginMode  # = PORTFOLIO
     params: PortfolioMarginParams
 
 
@@ -251,30 +263,30 @@ class SettlementPoolData(TypedDict):
 
 
 class SimpleMarginAssetParam(TypedDict):
-    futures_initial_margin: StrDecimal
-    futures_maintenance_margin: StrDecimal
-    futures_leverage: StrDecimal
-    option_initial_margin: StrDecimal
-    option_initial_margin_min: StrDecimal
-    option_maintenance_margin: StrDecimal
+    futures_initial_margin: StrDecimal  # ∈ [0, 1]
+    futures_maintenance_margin: StrDecimal  # ∈ [0, 1]
+    futures_leverage: StrDecimal  # > 0
+    option_initial_margin: StrDecimal  # ∈ [0, 1]
+    option_initial_margin_min: StrDecimal  # ∈ [0, 1]
+    option_maintenance_margin: StrDecimal  # ∈ [0, 1]
 
 
 class SimpleMarginParams(TypedDict):
     asset_params: Dict[AssetToken, SimpleMarginAssetParam]
     default_asset_param: SimpleMarginAssetParam
-    liquidation_penalty: StrDecimal
+    liquidation_penalty: StrDecimal  # ∈ [0, 1]
     auto_liquidation: bool
 
 
 class SimpleMarginParamsTag(TypedDict):
-    margin_mode: MarginMode  # == SIMPLE
+    margin_mode: MarginMode  # = SIMPLE
     params: SimpleMarginParams
 
 
 class Spot(TypedDict):
-    instrument_type: InstrumentType  # == SPOT
+    instrument_type: InstrumentType  # = SPOT
     underlying: str
-    settlement_asset: str
+    settlement_asset: str  # = 'USDC'
 
 
 class StructurePrice(TypedDict):
@@ -289,16 +301,16 @@ class StructurePrice(TypedDict):
 
 
 class UseExistingPool(TypedDict):
-    strategy: PoolStrategyType  # == USE_EXISTING
+    strategy: PoolStrategyType  # = USE_EXISTING
     pool_id: UUIDv4
 
 
 class VanillaOption(TypedDict):
-    instrument_type: InstrumentType  # == VANILLA_OPTION
-    underlying: str
-    settlement_asset: str
-    expiry: DateTimeRFC3339
-    strike: StrDecimal
+    instrument_type: InstrumentType  # = VANILLA_OPTION
+    underlying: str  # ∈ {'BTC', 'ETH'}
+    settlement_asset: str  # = 'USDC'
+    expiry: DateTimeRFC3339  # date in the future or datetime at 08:00:00Z
+    strike: StrDecimal  # > 0
     payoff: PayoffType
     exercise: ExerciseType
 
@@ -366,8 +378,8 @@ class InstrumentPrice(TypedDict):
 
 class LegQuote(TypedDict):
     target_rfq_leg_id: UUIDv4
-    ask: Optional[StrDecimal]
-    bid: Optional[StrDecimal]
+    ask: Optional[StrDecimal]  # > 0
+    bid: Optional[StrDecimal]  # > 0
 
 
 class MakerLastLookResponse(TypedDict):
