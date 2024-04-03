@@ -441,6 +441,7 @@ class QuoteAcceptResponse(TypedDict):
 class RFQ(TypedDict):
     rfq_id: UUIDv4
     created_at: DateTimeRFC3339
+    clearing_status: Optional[ClearingStatus]
     structure: 'Structure'
     structure_price: Optional[StructurePrice]
     rfq_expires_at: DateTimeRFC3339
