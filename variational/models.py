@@ -121,8 +121,10 @@ class AtomicDepositDetails(TypedDict):
     rfq_id: UUIDv4
     parent_quote_id: UUIDv4
     pool_address: H160
+    creator_company_id: UUIDv4
     creator_address: H160
     creator_transfer_amount: StrDecimal
+    other_company_id: UUIDv4
     other_address: H160
     other_transfer_amount: StrDecimal
 
