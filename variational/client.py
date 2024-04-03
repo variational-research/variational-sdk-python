@@ -12,7 +12,7 @@ from .models import (StrDecimal, DateTimeRFC3339, AssetToken, UUIDv4, Company, A
                      PortfolioSummary, Quote, RFQ, SupportedAssetDetails, AuthContext, Status,
                      Structure, PoolStrategy, LegQuote, QuoteAcceptResponse, MakerLastLookResponse,
                      MarginParams, TradeSide, TransferType, RequestAction, StructurePriceResponse,
-                     Instrument, InstrumentPrice)
+                     Instrument, InstrumentPrice, AtomicDepositDetails)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
 RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-resets-in-ms"
@@ -114,7 +114,7 @@ class Client(object):
         return ApiList.from_response(self.__send_request(endpoint="/addresses", filter=f))
 
     def get_atomic_deposit_details(self, rfq_id: UUIDv4,
-                                   parent_quote_id: UUIDv4) -> ApiList[Address]:
+                                   parent_quote_id: UUIDv4) -> ApiSingle[AtomicDepositDetails]:
         return ApiSingle.from_response(
             self.__send_request(endpoint="/quotes/atomic_deposit_details", filter={
                 'rfq_id': rfq_id,
