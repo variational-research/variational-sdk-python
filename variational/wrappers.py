@@ -16,6 +16,7 @@ class ResponseMetadata:
 
 @dataclass
 class ApiError(Exception):
+    url: str
     status_code: int
     api_code: int
     message: str

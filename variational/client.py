@@ -113,6 +113,12 @@ class Client(object):
             f['company'] = company
         return ApiList.from_response(self.__send_request(endpoint="/addresses", filter=f))
 
+    def get_atomic_deposit_details(self, rfq_id: UUIDv4, parent_quote_id: UUIDv4) -> ApiList[Address]:
+        return ApiSingle.from_response(self.__send_request(endpoint="/quotes/atomic_deposit_details", filter={
+            'rfq_id': rfq_id,
+            'parent_quote_id': parent_quote_id,
+        }))
+
     def get_companies(self, id: Optional[UUIDv4] = None,
                       page: Optional[Dict] = None) -> ApiPage[Company]:
         filter = {}
@@ -266,9 +272,9 @@ class Client(object):
         qs = ("?" + urlencode(params)) if params else ''
         backoff = ExpBackoff()
 
+        full_url = self.base_url + endpoint + qs
         while True:
-            req = requests.Request(method=method, url=self.base_url + endpoint + qs,
-                                   json=payload).prepare()
+            req = requests.Request(method=method, url=full_url, json=payload).prepare()
             resp = self.sesh.send(sign_prepared_request(req, self.key, self.secret),
                                   timeout=self.request_timeout)
 
@@ -287,7 +293,7 @@ class Client(object):
                     continue
 
             data = resp.json()
-            raise ApiError(status_code=resp.status_code, api_code=data['error']['code'],
+            raise ApiError(url=full_url, status_code=resp.status_code, api_code=data['error']['code'],
                            message=data['error']['message'])
 
 
