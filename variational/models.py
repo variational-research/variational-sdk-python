@@ -127,7 +127,7 @@ class ClearingEvent(TypedDict):
 
 class CreateNewPool(TypedDict):
     strategy: PoolStrategyType  # = CREATE_NEW
-    name: str
+    name: str  # length ∈ [1, 50]
     creator_params: 'MarginParams'
     other_params: 'MarginParams'
 
