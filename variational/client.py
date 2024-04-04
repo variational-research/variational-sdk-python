@@ -220,13 +220,13 @@ class Client(object):
     def get_status(self) -> ApiSingle[Status]:
         return ApiSingle.from_response(self.__send_request(endpoint="/status"))
 
-    def get_supported_assets(self, verified: Optional[bool] = False, page: Optional[Dict] = None) \
+    def get_supported_assets(self, verified: Optional[bool] = False) \
             -> ApiSingle[Dict[AssetToken, List[SupportedAssetDetails]]]:
         filter = {}
         if verified:
             filter['verified'] = 'true'
         return ApiSingle.from_response(self.__send_request(
-            endpoint="/metadata/supported_assets", filter=filter, page=page))
+            endpoint="/metadata/supported_assets", filter=filter))
 
     def maker_last_look(self, rfq_id: UUIDv4, parent_quote_id: UUIDv4,
                         action: RequestAction) -> ApiSingle[MakerLastLookResponse]:
