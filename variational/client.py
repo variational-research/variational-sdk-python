@@ -113,14 +113,6 @@ class Client(object):
             f['company'] = company
         return ApiList.from_response(self.__send_request(endpoint="/addresses", filter=f))
 
-    def get_atomic_deposit_details(self, rfq_id: UUIDv4,
-                                   parent_quote_id: UUIDv4) -> ApiSingle[AtomicDepositDetails]:
-        return ApiSingle.from_response(
-            self.__send_request(endpoint="/quotes/atomic_deposit_details", filter={
-                'rfq_id': rfq_id,
-                'parent_quote_id': parent_quote_id,
-            }))
-
     def get_companies(self, id: Optional[UUIDv4] = None,
                       page: Optional[Dict] = None) -> ApiPage[Company]:
         filter = {}
