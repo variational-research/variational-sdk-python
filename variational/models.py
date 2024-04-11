@@ -375,6 +375,7 @@ class LegQuote(TypedDict):
 class MakerLastLookResponse(TypedDict):
     new_clearing_status: ClearingStatus
     pending_deposits_sum_qty: StrDecimal
+    settlement_pool_address: H160
 
 
 MarginParams = Union[SimpleMarginParamsTag, PortfolioMarginParamsTag]
