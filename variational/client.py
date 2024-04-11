@@ -12,7 +12,7 @@ from .models import (StrDecimal, DateTimeRFC3339, AssetToken, UUIDv4, Company, A
                      PortfolioSummary, Quote, RFQ, SupportedAssetDetails, AuthContext, Status,
                      Structure, PoolStrategy, LegQuote, QuoteAcceptResponse, MakerLastLookResponse,
                      MarginParams, TradeSide, TransferType, RequestAction, StructurePriceResponse,
-                     Instrument, InstrumentPrice, AtomicDepositDetails)
+                     Instrument, InstrumentPrice)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
 RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-resets-in-ms"
