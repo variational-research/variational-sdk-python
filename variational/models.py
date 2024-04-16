@@ -277,6 +277,7 @@ class Spot(TypedDict):
     instrument_type: InstrumentType  # = SPOT
     underlying: str
     settlement_asset: str  # = 'USDC'
+    dex_token_details: Optional[DexTokenDetails]  # required if underlying is a DEX token
 
 
 class StructurePrice(TypedDict):
