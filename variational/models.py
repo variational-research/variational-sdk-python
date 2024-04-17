@@ -15,6 +15,11 @@ class ApiRole(StrEnum):
     WRITER = "writer"
 
 
+class AllowanceType(StrEnum):
+    BASE = "base"
+    DECIMAL = "decimal"
+
+
 class ClearingStatus(StrEnum):
     PENDING_TAKER_DEPOSIT_APPROVAL = "pending_taker_deposit_approval"
     PENDING_MAKER_DEPOSIT_APPROVAL = "pending_maker_deposit_approval"
@@ -327,6 +332,11 @@ class AggregatedPosition(TypedDict):
     sum_theta: StrDecimal
     sum_vega: StrDecimal
     position_info: 'Position'
+
+
+class Allowance(TypedDict):
+    type: AllowanceType
+    value: StrDecimal | int
 
 
 class Asset(TypedDict):

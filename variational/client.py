@@ -7,8 +7,8 @@ from urllib.parse import urlencode
 import requests
 
 from .auth import sign_prepared_request
-from .models import (StrDecimal, DateTimeRFC3339, AssetToken, UUIDv4, Company, Address,
-                     SettlementPool, Asset, Position, AggregatedPosition, Trade, Transfer,
+from .models import (StrDecimal, DateTimeRFC3339, H160, Allowance, AssetToken, UUIDv4, Company,
+                     Address, SettlementPool, Asset, Position, AggregatedPosition, Trade, Transfer,
                      PortfolioSummary, Quote, RFQ, SupportedAssetDetails, AuthContext, Status,
                      Structure, PoolStrategy, LegQuote, QuoteAcceptResponse, MakerLastLookResponse,
                      MarginParams, TradeSide, TransferType, RequestAction, StructurePriceResponse,
@@ -106,6 +106,16 @@ class Client(object):
         }
         return ApiSingle.from_response(self.__send_request(endpoint="/transfers/new",
                                                            method="POST", payload=payload))
+
+    def generate_transfer_permit(self, pool_address: H160, allowance: Allowance,
+                                 seconds_until_expiry: Optional[int] = None) -> ApiSingle[dict]:
+        payload = {
+            "pool_address": pool_address,
+            "allowance": allowance,
+            "seconds_until_expiry": seconds_until_expiry,
+        }
+        return ApiSingle.from_response(self.__send_request(
+            endpoint="/transfers/permit/template", method="POST", payload=payload))
 
     def get_addresses(self, company: Optional[UUIDv4] = None) -> ApiList[Address]:
         f = {}
@@ -252,6 +262,14 @@ class Client(object):
         }
 
         return ApiSingle.from_response(self.__send_request(endpoint="/quotes/replace",
+                                                           method="POST", payload=payload))
+
+    def submit_transfer_permit(self, message: dict, signature: str) -> ApiSingle[bool]:
+        payload = {
+            "message": message,
+            "signature": signature,
+        }
+        return ApiSingle.from_response(self.__send_request(endpoint="/transfers/permit",
                                                            method="POST", payload=payload))
 
     def __send_request(self, endpoint: str, method: str = "GET",
