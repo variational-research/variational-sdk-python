@@ -52,7 +52,7 @@ class PollingHelper(object):
             object_type='transfer',
             object_id=id,
             status=status,
-            fetch_objs=lambda: self.client.get_portfolio_transfers(id=id).result,
+            fetch_objs=lambda: self.client.get_transfers(id=id).result,
             get_status=lambda obj: obj['status'],
             is_desired=lambda s: s == status,
             is_final=lambda s: s in (TransferStatus.CONFIRMED, TransferStatus.FAILED)

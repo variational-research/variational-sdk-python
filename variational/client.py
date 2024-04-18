@@ -169,8 +169,8 @@ class Client(object):
         return ApiPage.from_response(self.__send_request(endpoint="/portfolio/trades",
                                                          filter=filter, page=page))
 
-    def get_portfolio_transfers(self, pool: Optional[UUIDv4] = None, id: Optional[UUIDv4] = None,
-                                page: Optional[Dict] = None) -> ApiPage[Transfer]:
+    def get_transfers(self, pool: Optional[UUIDv4] = None, id: Optional[UUIDv4] = None,
+                      page: Optional[Dict] = None) -> ApiPage[Transfer]:
         filter = {}
         if pool:
             filter['pool'] = pool
