@@ -176,7 +176,7 @@ class Client(object):
             filter['pool'] = pool
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__send_request(endpoint="/portfolio/transfers",
+        return ApiPage.from_response(self.__send_request(endpoint="/transfers",
                                                          filter=filter, page=page))
 
     def get_quotes(self, id: Optional[UUIDv4] = None,
