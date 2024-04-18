@@ -179,6 +179,14 @@ class Client(object):
         return ApiPage.from_response(self.__send_request(endpoint="/portfolio/transfers",
                                                          filter=filter, page=page))
 
+    def get_quotes(self, id: Optional[UUIDv4] = None,
+                   page: Optional[Dict] = None) -> ApiPage[Quote]:
+        filter = {}
+        if id:
+            filter['id'] = id
+        return ApiPage.from_response(self.__send_request(endpoint="/quotes",
+                                                         filter=filter, page=page))
+
     def get_quotes_received(self, id: Optional[UUIDv4] = None,
                             page: Optional[Dict] = None) -> ApiPage[Quote]:
         filter = {}

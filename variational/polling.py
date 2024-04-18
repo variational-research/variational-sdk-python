@@ -1,9 +1,9 @@
 from time import sleep
-from typing import Callable, List
+from typing import Callable, List, Union, Iterable
 
 from .client import Client
 from .models import (SettlementPoolStatus, TransferStatus, ClearingStatus, SettlementPool,
-                     Transfer, Quote, RFQ)
+                     Transfer, Quote, UUIDv4)
 
 
 class PollingHelper(object):
@@ -16,6 +16,12 @@ class PollingHelper(object):
     def wait_for_settlement_pool(self, pool_location: str,
                                  status: SettlementPoolStatus = SettlementPoolStatus.OPEN) \
             -> SettlementPool:
+        """
+        Requests a settlement pool with the given `pool_location` until it reaches
+        the desired status, returning the pool.
+        Returns an error if a different final status is reached.
+        Returns an error if runs out of attempts.
+        """
         return self.__poll_for_status(
             object_type='settlement pool',
             object_id=pool_location,
@@ -27,6 +33,12 @@ class PollingHelper(object):
 
     def wait_for_transfer(self, id: str,
                           status: TransferStatus = TransferStatus.CONFIRMED) -> Transfer:
+        """
+        Requests a transfer with the given `id` until it reaches the desired status,
+        returning the transfer.
+        Returns an error if a different final status is reached.
+        Returns an error if runs out of attempts.
+        """
         return self.__poll_for_status(
             object_type='transfer',
             object_id=id,
@@ -36,51 +48,27 @@ class PollingHelper(object):
             is_final=lambda s: s in (TransferStatus.CONFIRMED, TransferStatus.FAILED)
         )
 
-    def wait_for_quote_sent(self, id: str, status: ClearingStatus) -> Quote:
+    def wait_for_clearing_status(self, parent_quote_id: UUIDv4,
+                                 status: Union[ClearingStatus, Iterable[ClearingStatus]]) -> Quote:
+        """
+        Requests a quote with the given `parent_quote_id` until it reaches
+        one of the desired statuses, returning the quote.
+        The desired status can be a single status or an iterable collection of statuses.
+        Returns an error if a different final status is reached.
+        Returns an error if runs out of attempts.
+        """
         return self.__poll_for_status(
-            object_type='sent quote',
-            object_id=id,
+            object_type='quote',
+            object_id=parent_quote_id,
             status=status,
-            fetch_objs=lambda: self.client.get_quotes_sent(id=id).result,
+            fetch_objs=lambda: self.client.get_quotes(id=parent_quote_id).result,
             get_status=lambda obj: obj['clearing_status'],
             is_final=lambda s: (s == ClearingStatus.SUCCESS_TRADES_BOOKED_INTO_POOL or
                                 s is not None and s.startswith('rejected_'))
         )
 
-    def wait_for_quote_received(self, id: str, status: ClearingStatus) -> Quote:
-        return self.__poll_for_status(
-            object_type='received quote',
-            object_id=id,
-            status=status,
-            fetch_objs=lambda: self.client.get_quotes_received(id=id).result,
-            get_status=lambda obj: obj['clearing_status'],
-            is_final=lambda s: (s == ClearingStatus.SUCCESS_TRADES_BOOKED_INTO_POOL or
-                                s is not None and s.startswith('rejected_'))
-        )
-
-    def wait_for_rfq_sent(self, id: str, status: ClearingStatus) -> RFQ:
-        return self.__poll_for_status(
-            object_type='sent rfq',
-            object_id=id,
-            status=status,
-            fetch_objs=lambda: self.client.get_rfqs_sent(id=id).result,
-            get_status=lambda obj: obj['clearing_status'],
-            is_final=lambda s: (s == ClearingStatus.SUCCESS_TRADES_BOOKED_INTO_POOL or
-                                s is not None and s.startswith('rejected_'))
-        )
-
-    def wait_for_rfq_received(self, id: str, status: ClearingStatus) -> RFQ:
-        return self.__poll_for_status(
-            object_type='received rfq',
-            object_id=id,
-            status=status,
-            fetch_objs=lambda: self.client.get_rfqs_received(id=id).result,
-            get_status=lambda obj: obj['clearing_status'],
-            is_final=lambda s: (s == ClearingStatus.SUCCESS_TRADES_BOOKED_INTO_POOL or
-                                s is not None and s.startswith('rejected_'))
-        )
-
-    def __poll_for_status(self, object_type: str, object_id: str, status: str,
+    def __poll_for_status(self, object_type: str, object_id: str,
+                          status: Union[str, Iterable[str]],
                           fetch_objs: Callable[[], List[dict]],
                           get_status: Callable[[dict], str],
                           is_final: Callable[[str], bool]):
@@ -94,8 +82,13 @@ class PollingHelper(object):
             obj = objs[0]
 
             current_status = get_status(obj)
-            if current_status == status:
-                return obj
+
+            if isinstance(status, str):
+                if current_status == status:
+                    return obj
+            elif isinstance(status, Iterable):
+                if current_status in status:
+                    return obj
 
             if is_final(current_status):
                 raise UnexpectedStatus(
