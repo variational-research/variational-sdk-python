@@ -60,9 +60,8 @@ class PollingHelper(object):
 
     def wait_for_clearing_status(self, parent_quote_id: UUIDv4, status: ClearingStatus) -> Quote:
         """
-        Requests a quote with the given `parent_quote_id` until it reaches the desired statuses,
-        returning the quote.
-        Also returns successfully if the quote progresses beyond the desired status.
+        Requests a quote with the given `parent_quote_id` until it reaches the desired status
+        or progresses beyond it, returning the quote.
         Returns an error if a different final status is reached.
         Returns an error if runs out of attempts.
         """
@@ -84,7 +83,8 @@ class PollingHelper(object):
 
             ord_current = self.clearing_order.get(current)
             ord_desired = self.clearing_order.get(desired)
-            if isinstance(ord_current, int) and isinstance(ord_desired, int) and ord_current >= ord_desired:
+            if (isinstance(ord_current, int) and isinstance(ord_desired, int)
+                    and ord_current >= ord_desired):
                 return True
 
             return False
