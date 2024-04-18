@@ -21,10 +21,10 @@ class AllowanceType(StrEnum):
 
 
 class ClearingStatus(StrEnum):
-    PENDING_TAKER_DEPOSIT_APPROVAL = "pending_taker_deposit_approval"
-    PENDING_MAKER_DEPOSIT_APPROVAL = "pending_maker_deposit_approval"
-    PENDING_MAKER_LAST_LOOK = "pending_maker_last_look"
     PENDING_POOL_CREATION = "pending_pool_creation"
+    PENDING_TAKER_DEPOSIT_APPROVAL = "pending_taker_deposit_approval"
+    PENDING_MAKER_LAST_LOOK = "pending_maker_last_look"
+    PENDING_MAKER_DEPOSIT_APPROVAL = "pending_maker_deposit_approval"
     PENDING_ATOMIC_DEPOSIT = "pending_atomic_deposit"
     REJECTED_FAILED_TAKER_DEPOSIT_APPROVAL = "rejected_failed_taker_deposit_approval"
     REJECTED_FAILED_MAKER_DEPOSIT_APPROVAL = "rejected_failed_maker_deposit_approval"
