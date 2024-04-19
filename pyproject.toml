@@ -11,6 +11,7 @@ authors = [
 dependencies = [
     "requests >= 2.12",
     "Brotli >= 1.0",
+    "eth-account >= 0.11"
 ]
 description = "Variational Reference SDK"
 readme = "README.md"

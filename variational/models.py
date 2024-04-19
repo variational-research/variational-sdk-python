@@ -15,11 +15,16 @@ class ApiRole(StrEnum):
     WRITER = "writer"
 
 
+class AllowanceType(StrEnum):
+    BASE = "base"
+    DECIMAL = "decimal"
+
+
 class ClearingStatus(StrEnum):
-    PENDING_TAKER_DEPOSIT_APPROVAL = "pending_taker_deposit_approval"
-    PENDING_MAKER_DEPOSIT_APPROVAL = "pending_maker_deposit_approval"
-    PENDING_MAKER_LAST_LOOK = "pending_maker_last_look"
     PENDING_POOL_CREATION = "pending_pool_creation"
+    PENDING_TAKER_DEPOSIT_APPROVAL = "pending_taker_deposit_approval"
+    PENDING_MAKER_LAST_LOOK = "pending_maker_last_look"
+    PENDING_MAKER_DEPOSIT_APPROVAL = "pending_maker_deposit_approval"
     PENDING_ATOMIC_DEPOSIT = "pending_atomic_deposit"
     REJECTED_FAILED_TAKER_DEPOSIT_APPROVAL = "rejected_failed_taker_deposit_approval"
     REJECTED_FAILED_MAKER_DEPOSIT_APPROVAL = "rejected_failed_maker_deposit_approval"
@@ -277,6 +282,7 @@ class Spot(TypedDict):
     instrument_type: InstrumentType  # = SPOT
     underlying: str
     settlement_asset: str  # = 'USDC'
+    dex_token_details: Optional[DexTokenDetails]  # required if underlying is a DEX token
 
 
 class StructurePrice(TypedDict):
@@ -328,21 +334,16 @@ class AggregatedPosition(TypedDict):
     position_info: 'Position'
 
 
+class Allowance(TypedDict):
+    type: AllowanceType
+    value: StrDecimal | int
+
+
 class Asset(TypedDict):
     company: UUIDv4
     pool_location: UUIDv4
     asset: AssetToken
     qty: StrDecimal
-
-
-class AtomicDepositDetails(TypedDict):
-    rfq_id: UUIDv4
-    parent_quote_id: UUIDv4
-    pool_address: H160
-    creator_address: H160
-    creator_transfer_amount: StrDecimal
-    other_address: H160
-    other_transfer_amount: StrDecimal
 
 
 class AuthContext(TypedDict):
@@ -385,7 +386,7 @@ class LegQuote(TypedDict):
 class MakerLastLookResponse(TypedDict):
     new_clearing_status: ClearingStatus
     pending_deposits_sum_qty: StrDecimal
-    atomic_deposit_details: Optional[AtomicDepositDetails]
+    settlement_pool_address: H160
 
 
 MarginParams = Union[SimpleMarginParamsTag, PortfolioMarginParamsTag]

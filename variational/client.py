@@ -7,12 +7,12 @@ from urllib.parse import urlencode
 import requests
 
 from .auth import sign_prepared_request
-from .models import (StrDecimal, DateTimeRFC3339, AssetToken, UUIDv4, Company, Address,
-                     SettlementPool, Asset, Position, AggregatedPosition, Trade, Transfer,
+from .models import (StrDecimal, DateTimeRFC3339, H160, Allowance, AssetToken, UUIDv4, Company,
+                     Address, SettlementPool, Asset, Position, AggregatedPosition, Trade, Transfer,
                      PortfolioSummary, Quote, RFQ, SupportedAssetDetails, AuthContext, Status,
                      Structure, PoolStrategy, LegQuote, QuoteAcceptResponse, MakerLastLookResponse,
                      MarginParams, TradeSide, TransferType, RequestAction, StructurePriceResponse,
-                     Instrument, InstrumentPrice, AtomicDepositDetails)
+                     Instrument, InstrumentPrice)
 from .wrappers import ApiSingle, ApiList, ApiPage, ApiError
 
 RATE_LIMIT_RESET_MS_HEADER = "x-rate-limit-resets-in-ms"
@@ -107,19 +107,21 @@ class Client(object):
         return ApiSingle.from_response(self.__send_request(endpoint="/transfers/new",
                                                            method="POST", payload=payload))
 
+    def generate_transfer_permit(self, pool_address: H160, allowance: Allowance,
+                                 seconds_until_expiry: Optional[int] = None) -> ApiSingle[dict]:
+        payload = {
+            "pool_address": pool_address,
+            "allowance": allowance,
+            "seconds_until_expiry": seconds_until_expiry,
+        }
+        return ApiSingle.from_response(self.__send_request(
+            endpoint="/transfers/permit/template", method="POST", payload=payload))
+
     def get_addresses(self, company: Optional[UUIDv4] = None) -> ApiList[Address]:
         f = {}
         if company:
             f['company'] = company
         return ApiList.from_response(self.__send_request(endpoint="/addresses", filter=f))
-
-    def get_atomic_deposit_details(self, rfq_id: UUIDv4,
-                                   parent_quote_id: UUIDv4) -> ApiSingle[AtomicDepositDetails]:
-        return ApiSingle.from_response(
-            self.__send_request(endpoint="/quotes/atomic_deposit_details", filter={
-                'rfq_id': rfq_id,
-                'parent_quote_id': parent_quote_id,
-            }))
 
     def get_companies(self, id: Optional[UUIDv4] = None,
                       page: Optional[Dict] = None) -> ApiPage[Company]:
@@ -167,14 +169,22 @@ class Client(object):
         return ApiPage.from_response(self.__send_request(endpoint="/portfolio/trades",
                                                          filter=filter, page=page))
 
-    def get_portfolio_transfers(self, pool: Optional[UUIDv4] = None, id: Optional[UUIDv4] = None,
-                                page: Optional[Dict] = None) -> ApiPage[Transfer]:
+    def get_transfers(self, pool: Optional[UUIDv4] = None, id: Optional[UUIDv4] = None,
+                      page: Optional[Dict] = None) -> ApiPage[Transfer]:
         filter = {}
         if pool:
             filter['pool'] = pool
         if id:
             filter['id'] = id
-        return ApiPage.from_response(self.__send_request(endpoint="/portfolio/transfers",
+        return ApiPage.from_response(self.__send_request(endpoint="/transfers",
+                                                         filter=filter, page=page))
+
+    def get_quotes(self, id: Optional[UUIDv4] = None,
+                   page: Optional[Dict] = None) -> ApiPage[Quote]:
+        filter = {}
+        if id:
+            filter['id'] = id
+        return ApiPage.from_response(self.__send_request(endpoint="/quotes",
                                                          filter=filter, page=page))
 
     def get_quotes_received(self, id: Optional[UUIDv4] = None,
@@ -260,6 +270,14 @@ class Client(object):
         }
 
         return ApiSingle.from_response(self.__send_request(endpoint="/quotes/replace",
+                                                           method="POST", payload=payload))
+
+    def submit_transfer_permit(self, message: dict, signature: str) -> ApiSingle[bool]:
+        payload = {
+            "message": message,
+            "signature": signature,
+        }
+        return ApiSingle.from_response(self.__send_request(endpoint="/transfers/permit",
                                                            method="POST", payload=payload))
 
     def __send_request(self, endpoint: str, method: str = "GET",
