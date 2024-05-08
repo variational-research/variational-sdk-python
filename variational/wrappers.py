@@ -33,9 +33,8 @@ class ApiSingle(Generic[T]):
     @staticmethod
     def from_response(response: requests.Response):
         return ApiSingle(
-            result=response.json()['result'],
-            meta=ResponseMetadata(
-                _get_request_received_timestamp(response.headers)),
+            result=response.json()["result"],
+            meta=ResponseMetadata(_get_request_received_timestamp(response.headers)),
         )
 
 
@@ -47,9 +46,8 @@ class ApiList(Generic[T]):
     @staticmethod
     def from_response(response: requests.Response):
         return ApiList(
-            result=response.json()['result'],
-            meta=ResponseMetadata(
-                _get_request_received_timestamp(response.headers)),
+            result=response.json()["result"],
+            meta=ResponseMetadata(_get_request_received_timestamp(response.headers)),
         )
 
 
@@ -68,10 +66,9 @@ class ApiPage(Generic[T]):
     def from_response(response: requests.Response):
         data = response.json()
         return ApiPage(
-            result=data['result'],
-            pagination=Pagination(next_page=data['pagination']['next_page']),
-            meta=ResponseMetadata(
-                _get_request_received_timestamp(response.headers)),
+            result=data["result"],
+            pagination=Pagination(next_page=data["pagination"]["next_page"]),
+            meta=ResponseMetadata(_get_request_received_timestamp(response.headers)),
         )
 
 
@@ -79,5 +76,4 @@ def _get_request_received_timestamp(headers: Mapping) -> Optional[float]:
     for k, v in headers.items():
         if k.lower() == RATE_LIMIT_RESET_MS_HEADER:
             return int(v) / 1000
-    raise ValueError(
-        f"response didn't contain {RATE_LIMIT_RESET_MS_HEADER} header")
+    raise ValueError(f"response didn't contain {RATE_LIMIT_RESET_MS_HEADER} header")

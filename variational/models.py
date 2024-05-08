@@ -10,6 +10,7 @@ UUIDv4: TypeAlias = str  # e.g. "bdd68c99-65fe-4500-baae-5bc09b4af183"
 
 # Enums
 
+
 class ApiRole(StrEnum):
     READER = "reader"
     WRITER = "writer"
@@ -122,6 +123,7 @@ class TransferType(StrEnum):
 
 # Nested models
 
+
 class ClearingEvent(TypedDict):
     rfq_id: UUIDv4
     parent_quote_id: UUIDv4
@@ -133,8 +135,8 @@ class ClearingEvent(TypedDict):
 class CreateNewPool(TypedDict):
     strategy: PoolStrategyType  # = CREATE_NEW
     name: str  # length ∈ [1, 50]
-    creator_params: 'MarginParams'
-    other_params: 'MarginParams'
+    creator_params: "MarginParams"
+    other_params: "MarginParams"
 
 
 class DatedFuture(TypedDict):
@@ -163,7 +165,7 @@ class FundingRateParams(TypedDict):
 class Leg(TypedDict):
     side: TradeSide
     ratio: int  # ≥ 1
-    instrument: 'Instrument'
+    instrument: "Instrument"
 
 
 class MarginUsage(TypedDict):
@@ -176,13 +178,15 @@ class PerpetualFuture(TypedDict):
     underlying: str
     settlement_asset: str  # = 'USDC'
     funding_interval_s: int  # = 3600
-    dex_token_details: Optional[DexTokenDetails]  # required if underlying is a DEX token
+    dex_token_details: Optional[
+        DexTokenDetails
+    ]  # required if underlying is a DEX token
 
 
 class PoolMarginUsageStats(TypedDict):
     company: UUIDv4
     balance: StrDecimal
-    margin_params: 'MarginParams'
+    margin_params: "MarginParams"
     margin_usage: MarginUsage
 
 
@@ -219,12 +223,12 @@ class QuoteCommonMetadata(TypedDict):
     expires_at: DateTimeRFC3339
     pool_location: Optional[UUIDv4]
     new_pool_name: Optional[str]
-    creator_params: Optional['MarginParams']
-    other_params: Optional['MarginParams']
+    creator_params: Optional["MarginParams"]
+    other_params: Optional["MarginParams"]
     pool_creator_company: Optional[UUIDv4]
     pool_other_company: Optional[UUIDv4]
-    pool_creator_params: Optional['MarginParams']
-    pool_other_params: Optional['MarginParams']
+    pool_creator_params: Optional["MarginParams"]
+    pool_other_params: Optional["MarginParams"]
     clearing_events: List[ClearingEvent]
 
 
@@ -241,7 +245,7 @@ class QuoteWithMarginRequirements(TypedDict):
 class RFQLeg(TypedDict):
     rfq_leg_id: UUIDv4
     rfq_id: UUIDv4
-    instrument: 'Instrument'
+    instrument: "Instrument"
     side: TradeSide
     qty: StrDecimal
 
@@ -252,7 +256,7 @@ class SettlementPoolData(TypedDict):
     pool_address: Optional[H160]
     creator_address: H160
     other_address: H160
-    positions: List['AggregatedPosition']
+    positions: List["AggregatedPosition"]
     creator_company_margin_usage: PoolMarginUsageStats
     other_company_margin_usage: PoolMarginUsageStats
 
@@ -282,7 +286,9 @@ class Spot(TypedDict):
     instrument_type: InstrumentType  # = SPOT
     underlying: str
     settlement_asset: str  # = 'USDC'
-    dex_token_details: Optional[DexTokenDetails]  # required if underlying is a DEX token
+    dex_token_details: Optional[
+        DexTokenDetails
+    ]  # required if underlying is a DEX token
 
 
 class StructurePrice(TypedDict):
@@ -313,6 +319,7 @@ class VanillaOption(TypedDict):
 
 # Top-level models
 
+
 class Address(TypedDict):
     created_at: Optional[DateTimeRFC3339]
     company: UUIDv4
@@ -331,7 +338,7 @@ class AggregatedPosition(TypedDict):
     sum_rho: StrDecimal
     sum_theta: StrDecimal
     sum_vega: StrDecimal
-    position_info: 'Position'
+    position_info: "Position"
 
 
 class Allowance(TypedDict):
@@ -435,7 +442,7 @@ class Quote(TypedDict):
 
 class QuoteAcceptResponse(TypedDict):
     pending_deposits_sum_qty: StrDecimal
-    pending_settlement_pool: Optional['SettlementPool']
+    pending_settlement_pool: Optional["SettlementPool"]
     new_clearing_status: ClearingStatus
 
 
@@ -443,7 +450,7 @@ class RFQ(TypedDict):
     rfq_id: UUIDv4
     created_at: DateTimeRFC3339
     clearing_status: Optional[ClearingStatus]
-    structure: 'Structure'
+    structure: "Structure"
     structure_price: Optional[StructurePrice]
     rfq_expires_at: DateTimeRFC3339
     taker_company: UUIDv4
