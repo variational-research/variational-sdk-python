@@ -311,25 +311,32 @@ class Client(object):
         self,
         id: Optional[UUIDv4] = None,
         page: Optional[Dict] = None,
-        use_pricer: Optional[bool] = None,
+        price: Optional[bool] = None,
     ) -> ApiPage[RFQ]:
         filter = {}
         if id:
             filter["id"] = id
-        if use_pricer is None or use_pricer:
-            filter["use_pricer"] = "true"
+        if price is None or price:
+            filter["price"] = "true"
         else:
-            filter["use_pricer"] = "false"
+            filter["price"] = "false"
         return ApiPage.from_response(
             self.__send_request(endpoint="/rfqs/received", filter=filter, page=page)
         )
 
     def get_rfqs_sent(
-        self, id: Optional[UUIDv4] = None, page: Optional[Dict] = None
+        self,
+        id: Optional[UUIDv4] = None,
+        page: Optional[Dict] = None,
+        price: Optional[bool] = None,
     ) -> ApiPage[RFQ]:
         filter = {}
         if id:
             filter["id"] = id
+        if price is None or price:
+            filter["price"] = "true"
+        else:
+            filter["price"] = "false"
         return ApiPage.from_response(
             self.__send_request(endpoint="/rfqs/sent", filter=filter, page=page)
         )
