@@ -20,8 +20,8 @@ pycryptodome==3.20.0
 pydantic==2.7.0
 pydantic_core==2.18.1
 regex==2024.4.16
-requests==2.31.0
+requests==2.32.2
 rlp==4.0.0
 toolz==0.12.1
 typing_extensions==4.11.0
-urllib3==2.2.1
+urllib3==2.2.2
