@@ -7,7 +7,8 @@ from .models import Instrument, AssetToken, SupportedAssetDetails, PrecisionRequ
 
 def find_asset_details_for_instrument(
         instrument: Instrument,
-        supported_assets: Dict[AssetToken, List[SupportedAssetDetails]]) -> Optional[SupportedAssetDetails]:
+        supported_assets: Dict[AssetToken, List[SupportedAssetDetails]]) \
+        -> Optional[SupportedAssetDetails]:
     underlying = instrument["underlying"]
     dex_key = instrument.get("dex_token_details")
 
