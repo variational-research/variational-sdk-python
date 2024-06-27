@@ -521,12 +521,14 @@ class StructurePriceResponse(TypedDict):
 
 class SupportedAssetDetails(TypedDict):
     asset: AssetToken
-    asset_name: str
     is_dex: bool
-    address: Optional[H160]
+    token_uri: Optional[str]
+    name: Optional[str]
+    address: Optional[str]
+    dex_token_details: Optional[
+        DexTokenDetails
+    ]
     verified: Optional[bool]
-    precision: int
-    last_updated_at: DateTimeRFC3339
     variational_funding_rate_params: FundingRateParams
     precision_requirements: Optional[PrecisionRequirements]
     min_qty_tick: Optional[StrDecimal]
