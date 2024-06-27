@@ -4,6 +4,9 @@ from typing import TypeAlias, TypedDict, Optional, Union, Dict, List
 AssetToken: TypeAlias = str  # e.g. "BTC", "ETH", etc
 DateTimeRFC3339: TypeAlias = str  # e.g. "2024-02-02T06:13:45.323432Z"
 H160: TypeAlias = str  # e.g. "0x3d68316712565ccb7f14a2bfc6aa785d6d2d12d5"
+H256: TypeAlias = (
+    str  # e.g. "0xc72177fa4c79eb52a731f95f48adaba0d0764c7ab6015208a0370011f4e11848"
+)
 StrDecimal: TypeAlias = str  # e.g. "218205.58082"
 UUIDv4: TypeAlias = str  # e.g. "bdd68c99-65fe-4500-baae-5bc09b4af183"
 
@@ -32,6 +35,13 @@ class ClearingStatus(StrEnum):
     REJECTED_MAKER_LAST_LOOK_REJECTED = "rejected_maker_last_look_rejected"
     REJECTED_MAKER_LAST_LOOK_EXPIRED = "rejected_maker_last_look_expired"
     REJECTED_FAILED_POOL_CREATION = "rejected_failed_pool_creation"
+    REJECTED_FAILED_RISK_CHECKS = "rejected_failed_risk_checks"
+    REJECTED_FAILED_TAKER_ACCEPT_QUOTE_EXPIRED = (
+        "rejected_failed_taker_accept_quote_expired"
+    )
+    REJECTED_FAILED_TAKER_ACCEPT_RFQ_EXPIRED = (
+        "rejected_failed_taker_accept_rfq_expired"
+    )
     REJECTED_FAILED_TAKER_FUNDING = "rejected_failed_taker_funding"
     REJECTED_FAILED_MAKER_FUNDING = "rejected_failed_maker_funding"
     REJECTED_FAILED_ATOMIC_DEPOSIT = "rejected_failed_atomic_deposit"
@@ -42,6 +52,8 @@ class DexNetworkID(StrEnum):
     ETH = "eth"
     BSC = "bsc"
     SOLANA = "solana"
+    ARBITRUM = "arbitrum"
+    BASE = "base"
 
 
 class ExerciseType(StrEnum):
@@ -99,9 +111,16 @@ class TradeSide(StrEnum):
     SELL = "sell"
 
 
+class TradeStatus(StrEnum):
+    pending = "PENDING"
+    failed = "FAILED"
+    confirmed = "CONFIRMED"
+
+
 class TradeType(StrEnum):
     TRADE = "trade"
     SETTLEMENT = "settlement"
+    SETTLEMENT_MARKET_DELISTED = "settlement_market_delisted"
     LIQUIDATION = "liquidation"
 
 
@@ -119,6 +138,8 @@ class TransferType(StrEnum):
     LIQUIDATION = "liquidation"
     REALIZED_PNL = "realized_pnl"
     INITIAL_MARGIN = "initial_margin"
+    FUNDING = "funding"
+    FEE = "fee"
 
 
 # Nested models
@@ -188,6 +209,7 @@ class PoolMarginUsageStats(TypedDict):
     balance: StrDecimal
     margin_params: "MarginParams"
     margin_usage: MarginUsage
+    max_withdrawable_amount: Optional[StrDecimal]
 
 
 class PortfolioMarginAssetParam(TypedDict):
@@ -214,6 +236,12 @@ class PortfolioMarginParams(TypedDict):
 class PortfolioMarginParamsTag(TypedDict):
     margin_mode: MarginMode  # = PORTFOLIO
     params: PortfolioMarginParams
+
+
+class PrecisionRequirements(TypedDict):
+    min_decimal_figures: int
+    max_decimal_only_figures: int
+    max_significant_figures: int
 
 
 class QuoteCommonMetadata(TypedDict):
@@ -259,6 +287,7 @@ class SettlementPoolData(TypedDict):
     positions: List["AggregatedPosition"]
     creator_company_margin_usage: PoolMarginUsageStats
     other_company_margin_usage: PoolMarginUsageStats
+    confirmed_by_transaction_id: Optional[H256]
 
 
 class SimpleMarginAssetParam(TypedDict):
@@ -390,6 +419,12 @@ class LegQuote(TypedDict):
     bid: Optional[StrDecimal]  # > 0
 
 
+class LimitsResponse(TypedDict):
+    min_order_notional: StrDecimal
+    max_order_notional: StrDecimal
+    default_precision_requirements: PrecisionRequirements
+
+
 class MakerLastLookResponse(TypedDict):
     new_clearing_status: ClearingStatus
     pending_deposits_sum_qty: StrDecimal
@@ -422,6 +457,7 @@ class Position(TypedDict):
     updated_at: Optional[DateTimeRFC3339]
     qty: StrDecimal
     avg_entry_price: StrDecimal
+    taker_qty: StrDecimal
 
 
 class Quote(TypedDict):
@@ -492,6 +528,8 @@ class SupportedAssetDetails(TypedDict):
     precision: int
     last_updated_at: DateTimeRFC3339
     variational_funding_rate_params: FundingRateParams
+    precision_requirements: Optional[PrecisionRequirements]
+    min_qty_tick: Optional[StrDecimal]
 
 
 class Trade(TypedDict):
@@ -508,6 +546,7 @@ class Trade(TypedDict):
     pool_location: UUIDv4
     role: TradeRole
     trade_type: TradeType
+    status: TradeStatus
 
 
 class Transfer(TypedDict):
@@ -522,3 +561,4 @@ class Transfer(TypedDict):
     target_pool_location: UUIDv4
     transfer_type: TransferType
     status: TransferStatus
+    confirmed_by_transaction_id: Optional[H256]
