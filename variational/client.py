@@ -31,6 +31,7 @@ from .models import (
     Structure,
     PoolStrategy,
     LegQuote,
+    LimitsResponse,
     QuoteAcceptResponse,
     MakerLastLookResponse,
     MarginParams,
@@ -209,6 +210,9 @@ class Client(object):
         return ApiPage.from_response(
             self.__send_request(endpoint="/companies", filter=filter, page=page)
         )
+
+    def get_limits(self) -> ApiSingle[LimitsResponse]:
+        return ApiSingle.from_response(self.__send_request(endpoint="/metadata/limits"))
 
     def get_me(self) -> ApiSingle[AuthContext]:
         return ApiSingle.from_response(self.__send_request(endpoint="/me"))
