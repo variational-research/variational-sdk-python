@@ -46,7 +46,8 @@ class ClearingStatus(StrEnum):
     REJECTED_FAILED_MAKER_FUNDING = "rejected_failed_maker_funding"
     REJECTED_FAILED_ATOMIC_DEPOSIT = "rejected_failed_atomic_deposit"
     REJECTED_FAILED_REDUCE_ONLY_CHECK = "rejected_failed_reduce_only_check"
-    SUCCESS_TRADES_BOOKED_INTO_POOL = "success_trades_booked_into_pool" 
+    SUCCESS_TRADES_BOOKED_INTO_POOL = "success_trades_booked_into_pool"
+
 
 class DexNetworkID(StrEnum):
     ETH = "eth"
