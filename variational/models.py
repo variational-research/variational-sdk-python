@@ -379,6 +379,7 @@ class Allowance(TypedDict):
 class Asset(TypedDict):
     company: UUIDv4
     pool_location: UUIDv4
+    counterparty: UUIDv4
     asset: AssetToken
     qty: StrDecimal
 
@@ -454,6 +455,7 @@ class PortfolioSummary(TypedDict):
 class Position(TypedDict):
     company: UUIDv4
     pool_location: UUIDv4
+    counterparty: UUIDv4
     instrument: Instrument
     updated_at: Optional[DateTimeRFC3339]
     qty: StrDecimal
@@ -541,6 +543,7 @@ class Trade(TypedDict):
     source_rfq_leg_id: Optional[UUIDv4]
     source_quote: Optional[UUIDv4]
     company: UUIDv4
+    counterparty: UUIDv4
     created_at: Optional[DateTimeRFC3339]
     side: TradeSide
     instrument: Instrument
@@ -559,6 +562,7 @@ class Transfer(TypedDict):
     oracle_request_id: Optional[UUIDv4]
     created_at: DateTimeRFC3339
     company: UUIDv4
+    counterparty: UUIDv4
     qty: StrDecimal
     asset: AssetToken
     target_pool_location: UUIDv4

@@ -162,12 +162,14 @@ class Client(object):
         asset: AssetToken,
         qty: StrDecimal,
         target_pool_location: UUIDv4,
+        counterparty: UUIDv4,
         transfer_type: TransferType,
     ) -> ApiSingle[Transfer]:
         payload = {
             "asset": asset,
             "qty": qty,
             "target_pool_location": target_pool_location,
+            "counterparty": counterparty,
             "transfer_type": transfer_type,
         }
         return ApiSingle.from_response(
