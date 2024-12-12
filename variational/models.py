@@ -36,6 +36,7 @@ class ClearingStatus(StrEnum):
     REJECTED_MAKER_LAST_LOOK_EXPIRED = "rejected_maker_last_look_expired"
     REJECTED_FAILED_POOL_CREATION = "rejected_failed_pool_creation"
     REJECTED_FAILED_RISK_CHECKS = "rejected_failed_risk_checks"
+    REJECTED_FAILED_TAKER_ACCEPT_NO_QUOTE = "rejected_failed_taker_accept_no_quote"
     REJECTED_FAILED_TAKER_ACCEPT_QUOTE_EXPIRED = (
         "rejected_failed_taker_accept_quote_expired"
     )
@@ -100,6 +101,11 @@ class SettlementPoolStatus(StrEnum):
     OPEN = "open"
     PENDING = "pending"
     CANCELED = "canceled"
+
+
+class SettlementPoolPartyStatus(StrEnum):
+    PENDING = "pending"
+    CONFIRMED = "confirmed"
 
 
 class TradeRole(StrEnum):
@@ -280,14 +286,22 @@ class RFQLeg(TypedDict):
 
 
 class SettlementPoolData(TypedDict):
+    created_at: DateTimeRFC3339
+    company_creator: UUIDv4
     status: SettlementPoolStatus
-    pool_name: str
-    pool_address: Optional[H160]
-    creator_address: H160
-    other_address: H160
+    address: Optional[H160]
+    name: str
+    confirmed_by_transaction_id: Optional[H256]
+    parties: List["SettlementPoolParty"]
     positions: List["AggregatedPosition"]
-    creator_company_margin_usage: PoolMarginUsageStats
-    other_company_margin_usage: PoolMarginUsageStats
+
+
+class SettlementPoolParty(TypedDict):
+    company: UUIDv4
+    created_at: DateTimeRFC3339
+    address: H160
+    margin_usage: PoolMarginUsageStats
+    status: SettlementPoolPartyStatus
     confirmed_by_transaction_id: Optional[H256]
 
 
@@ -481,7 +495,7 @@ class Quote(TypedDict):
 
 class QuoteAcceptResponse(TypedDict):
     pending_deposits_sum_qty: StrDecimal
-    pending_settlement_pool: Optional["SettlementPool"]
+    pending_settlement_pool: Optional["PendingSettlementPool"]
     new_clearing_status: ClearingStatus
 
 
@@ -508,6 +522,15 @@ class SettlementPool(TypedDict):
     error: Optional[str]
 
 
+class PendingSettlementPool(TypedDict):
+    id: UUIDv4
+    created_at: DateTimeRFC3339
+    status: SettlementPoolStatus
+    company_creator: UUIDv4
+    address: Optional[H160]
+    confirmed_by_transaction_id: Optional[H256]
+
+
 class Status(TypedDict):
     auth: Optional[AuthContext]
     server_timestamp_ms: int
@@ -528,9 +551,7 @@ class SupportedAssetDetails(TypedDict):
     token_uri: Optional[str]
     name: Optional[str]
     address: Optional[str]
-    dex_token_details: Optional[
-        DexTokenDetails
-    ]
+    dex_token_details: Optional[DexTokenDetails]
     verified: Optional[bool]
     variational_funding_rate_params: FundingRateParams
     precision_requirements: Optional[PrecisionRequirements]
