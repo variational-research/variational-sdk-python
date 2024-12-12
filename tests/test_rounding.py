@@ -3,9 +3,9 @@ from decimal import Decimal
 from variational import round_to_requirements, default_min_qty_tick
 
 DEFAULT_REQUIREMENTS = {
-    'min_decimal_figures': 2,
-    'max_decimal_only_figures': 4,
-    'max_significant_figures': 6,
+    "min_decimal_figures": 2,
+    "max_decimal_only_figures": 4,
+    "max_significant_figures": 6,
 }
 
 MIN_ORDER_NOTIONAL = Decimal("0.1")

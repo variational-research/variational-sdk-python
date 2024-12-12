@@ -525,9 +525,7 @@ class SupportedAssetDetails(TypedDict):
     token_uri: Optional[str]
     name: Optional[str]
     address: Optional[str]
-    dex_token_details: Optional[
-        DexTokenDetails
-    ]
+    dex_token_details: Optional[DexTokenDetails]
     verified: Optional[bool]
     variational_funding_rate_params: FundingRateParams
     precision_requirements: Optional[PrecisionRequirements]

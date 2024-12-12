@@ -6,9 +6,9 @@ from .models import Instrument, AssetToken, SupportedAssetDetails, PrecisionRequ
 
 
 def find_asset_details_for_instrument(
-        instrument: Instrument,
-        supported_assets: Dict[AssetToken, List[SupportedAssetDetails]]) \
-        -> Optional[SupportedAssetDetails]:
+    instrument: Instrument,
+    supported_assets: Dict[AssetToken, List[SupportedAssetDetails]],
+) -> Optional[SupportedAssetDetails]:
     underlying = instrument["underlying"]
     dex_key = instrument.get("dex_token_details")
 
@@ -24,7 +24,7 @@ def find_asset_details_for_instrument(
 
 
 def round_to_requirements(
-        d: Decimal, requirements: PrecisionRequirements, rounding=ROUND_HALF_UP
+    d: Decimal, requirements: PrecisionRequirements, rounding=ROUND_HALF_UP
 ) -> Decimal:
     abs_d = abs(d)
     m = abs_d
@@ -36,12 +36,12 @@ def round_to_requirements(
 
     quantize_to = None
     if abs_d >= 1:
-        allowed = int(ceil(m.log10())) + d10e - requirements['max_significant_figures']
-        places = min(allowed, -requirements['min_decimal_figures'])
+        allowed = int(ceil(m.log10())) + d10e - requirements["max_significant_figures"]
+        places = min(allowed, -requirements["min_decimal_figures"])
         if places > d10e:
             quantize_to = places
     elif abs_d > 0:
-        remove_places = int(ceil(m.log10())) - requirements['max_decimal_only_figures']
+        remove_places = int(ceil(m.log10())) - requirements["max_decimal_only_figures"]
         if remove_places > 0:
             quantize_to = d10e + remove_places
 
@@ -54,8 +54,7 @@ def round_to_requirements(
 def default_min_qty_tick(min_order_notional: Decimal, price: Decimal) -> Decimal:
     if price > Decimal(0):
         return min(
-            Decimal(1),
-            Decimal(10) ** floor((min_order_notional / price).log10())
+            Decimal(1), Decimal(10) ** floor((min_order_notional / price).log10())
         )
     else:
         return Decimal(1)
