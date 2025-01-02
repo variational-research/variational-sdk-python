@@ -130,7 +130,7 @@ class PollingHelper(object):
 
             objs = fetch_objs()
             if len(objs) < 1:
-                raise ObjectNotFound(msg=f"{object_type} '{object_id}' not found")
+                continue
             obj = objs[0]
 
             current_status = get_status(obj)
@@ -149,14 +149,6 @@ class PollingHelper(object):
             msg=f"timeout waiting for {object_type} '{object_id}'"
             f" to become '{status}'"
         )
-
-
-class ObjectNotFound(Exception):
-    def __init__(self, msg: str):
-        self.msg = msg
-
-    def __str__(self):
-        return self.msg
 
 
 class UnexpectedStatus(Exception):

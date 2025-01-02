@@ -49,7 +49,7 @@ class TransferPermitHelper(object):
             pool_address=pool_address,
             allowance={
                 "type": AllowanceType.BASE,
-                "value": 2**256 - 1,
+                "value": hex(2**256 - 1),
             },
             seconds_until_expiry=seconds_until_expiry,
         )
