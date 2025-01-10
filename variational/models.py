@@ -556,6 +556,8 @@ class SupportedAssetDetails(TypedDict):
     variational_funding_rate_params: FundingRateParams
     precision_requirements: Optional[PrecisionRequirements]
     min_qty_tick: Optional[StrDecimal]
+    fdv: Optional[StrDecimal]
+    volume_24h: Optional[StrDecimal]
 
 
 class Trade(TypedDict):
