@@ -1,5 +1,8 @@
 # Variational SDK for Python 
 
+> [!NOTE]
+> API key generation is currently unavailable. Please contact our team via hello@variational.io if you are interested in using the API service. 
+
 ## Documentation
 
 https://docs.variational.io/for-developers/api
