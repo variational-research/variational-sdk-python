@@ -45,7 +45,7 @@ def round_to_requirements(
         if remove_places > 0:
             quantize_to = d10e + remove_places
 
-    if quantize_to:
+    if quantize_to is not None:
         return d.quantize(Decimal(10) ** quantize_to, rounding)
 
     return d

@@ -8,6 +8,12 @@ DEFAULT_REQUIREMENTS = {
     "max_significant_figures": 6,
 }
 
+NO_MIN_DECIMALS_REQUIREMENTS = {
+    "min_decimal_figures": 0,
+    "max_decimal_only_figures": 4,
+    "max_significant_figures": 6,
+}
+
 MIN_ORDER_NOTIONAL = Decimal("0.1")
 
 
@@ -29,6 +35,24 @@ def test_round_to_requirements():
     round_and_assert(Decimal("123456.1"), Decimal("123456.1"))
     round_and_assert(Decimal("12345678.99"), Decimal("12345678.99"))
     round_and_assert(Decimal("1.123456789123456789"), Decimal("1.12346"))
+
+
+def test_round_to_requirements_no_min_decimals():
+    def round_and_assert(input, expect):
+        output = round_to_requirements(input, NO_MIN_DECIMALS_REQUIREMENTS)
+        assert output == expect
+
+    # the significant figure budget runs out exactly at the decimal point, so
+    # these have to be rounded all the way to a whole number
+    round_and_assert(Decimal("123456.78"), Decimal("123457"))
+    round_and_assert(Decimal("-123456.78"), Decimal("-123457"))
+    round_and_assert(Decimal("999999.99"), Decimal("1000000"))
+    round_and_assert(Decimal("1234567.89"), Decimal("1234568"))
+
+    # values that stay inside the budget are returned unchanged
+    round_and_assert(Decimal("0"), Decimal("0"))
+    round_and_assert(Decimal("123.45"), Decimal("123.45"))
+    round_and_assert(Decimal("0.001123"), Decimal("0.001123"))
 
 
 def test_default_min_qty_tick():
