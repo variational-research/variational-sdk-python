@@ -21,11 +21,12 @@ pip install variational
 
 ### 3. Make some requests!
 
-Store your API credentials in environment variables before running the example:
+Store your API credentials in environment variables before running the example. To avoid putting credentials directly into shell history, enter them interactively:
 
 ```bash
-export VARIATIONAL_API_KEY="your-api-key"
-export VARIATIONAL_API_SECRET="your-api-secret"
+read -rsp "Variational API key: " VARIATIONAL_API_KEY && echo
+read -rsp "Variational API secret: " VARIATIONAL_API_SECRET && echo
+export VARIATIONAL_API_KEY VARIATIONAL_API_SECRET
 ```
 
 ```python
