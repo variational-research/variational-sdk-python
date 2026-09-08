@@ -464,7 +464,8 @@ class Client(object):
                 return resp
 
             if self.retry_rate_limits and resp.status_code == 429:
-                if resets_in := _get_rate_limit_reset_timestamp(resp.headers):
+                resets_in = _get_rate_limit_reset_timestamp(resp.headers)
+                if resets_in is not None:
                     # delay for at least the amount specified in the header
                     # add an extra delay that's slowly increasing with each attempt
                     delay = resets_in + backoff.next_delay()
