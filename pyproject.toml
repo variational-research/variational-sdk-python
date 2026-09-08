@@ -9,7 +9,7 @@ authors = [
   { name="Variational Research", email="hello@variational.io" },
 ]
 dependencies = [
-    "requests >= 2.12",
+    "requests >= 2.31",
     "Brotli >= 1.0",
     "eth-account >= 0.11"
 ]
