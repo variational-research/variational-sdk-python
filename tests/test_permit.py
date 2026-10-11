@@ -46,12 +46,14 @@ class MockClient:
     """Mock API client for testing TransferPermitHelper without network calls."""
 
     def __init__(self, template: dict):
+        """Initialize mock client with base permit template."""
         self.template = template
         self.submitted_message = None
         self.submitted_signature = None
         self.last_allowance = None
 
     def generate_transfer_permit(self, pool_address, allowance, seconds_until_expiry=None):
+        """Mock template generation returning deep copy of template."""
         self.last_allowance = allowance
         return ApiSingle(
             result=copy.deepcopy(self.template),
@@ -59,6 +61,7 @@ class MockClient:
         )
 
     def submit_transfer_permit(self, message: dict, signature: str) -> ApiSingle[bool]:
+        """Mock permit submission recording message and signature."""
         self.submitted_message = message
         self.submitted_signature = signature
         return ApiSingle(

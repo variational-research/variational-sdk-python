@@ -9,10 +9,19 @@ from .wrappers import ApiSingle
 
 
 class TransferPermitHelper(object):
-    """Helper for generating, EIP-712 signing, and submitting transfer permits."""
+    """Helper for generating, EIP-712 signing, and submitting transfer permits.
+
+    Normalizes the EIP-712 domain chain ID returned by the API template across
+    integer, decimal string, and hexadecimal string representations to ensure
+    valid on-chain cryptographic signature verification.
+    """
 
     def __init__(self, client: Client, private_key: str):
-        """Initialize helper with API client and Ethereum private key."""
+        """Initialize helper with API client and Ethereum private key.
+
+        :param client: Initialized Variational API Client instance.
+        :param private_key: Hex-encoded Ethereum private key (with or without '0x' prefix).
+        """
         self.client = client
         self.__private_key = private_key
 
@@ -22,7 +31,13 @@ class TransferPermitHelper(object):
         allowance: StrDecimal,
         seconds_until_expiry: Optional[int] = None,
     ) -> ApiSingle[bool]:
-        """Sign and submit a transfer permit with allowance in decimal string format."""
+        """Sign and submit a transfer permit with allowance in decimal string format.
+
+        :param pool_address: Target settlement pool contract address (0x-prefixed H160).
+        :param allowance: Allowance amount represented as human-readable decimal string.
+        :param seconds_until_expiry: Optional validity duration in seconds.
+        :return: ApiSingle[bool] indicating successful permit submission and acceptance.
+        """
         return self._sign_and_submit(
             pool_address=pool_address,
             allowance={
@@ -38,7 +53,13 @@ class TransferPermitHelper(object):
         allowance: int,
         seconds_until_expiry: Optional[int] = None,
     ) -> ApiSingle[bool]:
-        """Sign and submit a transfer permit with allowance in integer base units."""
+        """Sign and submit a transfer permit with allowance in integer base units.
+
+        :param pool_address: Target settlement pool contract address (0x-prefixed H160).
+        :param allowance: Allowance amount in smallest token base units (e.g. 6 decimals for USDC).
+        :param seconds_until_expiry: Optional validity duration in seconds.
+        :return: ApiSingle[bool] indicating successful permit submission and acceptance.
+        """
         return self._sign_and_submit(
             pool_address=pool_address,
             allowance={
@@ -51,7 +72,12 @@ class TransferPermitHelper(object):
     def sign_and_submit_unlimited(
         self, pool_address: H160, seconds_until_expiry: Optional[int] = None
     ) -> ApiSingle[bool]:
-        """Sign and submit an unlimited transfer permit (max uint256 base units)."""
+        """Sign and submit an unlimited transfer permit (max uint256 base units).
+
+        :param pool_address: Target settlement pool contract address (0x-prefixed H160).
+        :param seconds_until_expiry: Optional validity duration in seconds.
+        :return: ApiSingle[bool] indicating successful permit submission and acceptance.
+        """
         return self._sign_and_submit(
             pool_address=pool_address,
             allowance={
@@ -67,7 +93,17 @@ class TransferPermitHelper(object):
         allowance: Allowance,
         seconds_until_expiry: Optional[int] = None,
     ) -> ApiSingle[bool]:
-        """Fetch template, normalize EIP-712 domain chainId, sign, and submit permit."""
+        """Fetch template, normalize EIP-712 domain chainId, sign, and submit permit.
+
+        Normalizes raw chain ID representations (e.g., integer 42161, decimal string '42161',
+        or hex string '0xa4b1') into native integer format required for correct EIP-712
+        domain separator computation and on-chain ecrecover validation.
+
+        :param pool_address: Target settlement pool contract address.
+        :param allowance: Allowance payload dictionary with type and value.
+        :param seconds_until_expiry: Optional validity duration in seconds.
+        :return: ApiSingle[bool] containing the API response confirming permit acceptance.
+        """
         msg = self.client.generate_transfer_permit(
             pool_address=pool_address,
             allowance=allowance,
