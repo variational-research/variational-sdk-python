@@ -44,6 +44,7 @@ pprint(summary)
  - `base_url`: str (optional) — prefix of Variational API endpoints
  - `request_timeout`: float (default=None) — timeout for individual HTTP requests
  - `retry_rate_limits`: bool (default=True) — enables automatic retry on HTTP 429 errors
+ - `max_rate_limit_retries`: int | None (default=10) — maximum retries after HTTP 429; `None` retries forever
 
 
 ### 4. Explore
