@@ -57,6 +57,7 @@ class Client(object):
         base_url: str = MAINNET,
         request_timeout: Optional[float] = None,
         retry_rate_limits=True,
+        max_rate_limit_retries: Optional[int] = 10,
     ):
         self.sesh = requests.session()
         self.key = key
@@ -65,6 +66,8 @@ class Client(object):
         self.logger = logging.getLogger(__name__)
         self.request_timeout = request_timeout
         self.retry_rate_limits = retry_rate_limits
+        # None retries forever (the previous behaviour)
+        self.max_rate_limit_retries = max_rate_limit_retries
 
     def accept_quote(
         self, rfq_id: UUIDv4, parent_quote_id: UUIDv4, side: TradeSide
@@ -453,6 +456,7 @@ class Client(object):
         backoff = ExpBackoff()
 
         full_url = self.base_url + endpoint + qs
+        retries = 0
         while True:
             req = requests.Request(method=method, url=full_url, json=payload).prepare()
             resp = self.sesh.send(
@@ -463,7 +467,14 @@ class Client(object):
             if resp.status_code == 200:
                 return resp
 
-            if self.retry_rate_limits and resp.status_code == 429:
+            if (
+                self.retry_rate_limits
+                and resp.status_code == 429
+                and (
+                    self.max_rate_limit_retries is None
+                    or retries < self.max_rate_limit_retries
+                )
+            ):
                 if resets_in := _get_rate_limit_reset_timestamp(resp.headers):
                     # delay for at least the amount specified in the header
                     # add an extra delay that's slowly increasing with each attempt
@@ -475,15 +486,30 @@ class Client(object):
                         delay,
                     )
                     time.sleep(delay)
+                    retries += 1
                     continue
 
-            data = resp.json()
-            raise ApiError(
-                url=full_url,
-                status_code=resp.status_code,
-                api_code=data["error"]["code"],
-                message=data["error"]["message"],
-            )
+            raise _api_error(resp, full_url)
+
+
+def _api_error(resp: requests.Response, url: str) -> ApiError:
+    # proxies and load balancers can answer with HTML or an empty body,
+    # so don't assume the API's JSON error envelope is present
+    try:
+        error = resp.json()["error"]
+        return ApiError(
+            url=url,
+            status_code=resp.status_code,
+            api_code=error["code"],
+            message=error["message"],
+        )
+    except (ValueError, KeyError, TypeError):
+        return ApiError(
+            url=url,
+            status_code=resp.status_code,
+            api_code=-1,
+            message=resp.text[:500] or resp.reason or "",
+        )
 
 
 class ExpBackoff:
